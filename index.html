@@ -857,7 +857,24 @@
         function logout() { localStorage.removeItem('svt_user_session'); currentUser = null; updateUIForUser(); showToast("Déconnecté", "info"); render(); }
         function showPremiumModal(t, m) { document.getElementById('premiumModalTitle').innerText = t; document.getElementById('premiumModalMsg').innerText = m; document.getElementById('premiumModal').classList.remove('hidden'); }
         function closePremiumModal() { document.getElementById('premiumModal').classList.add('hidden'); }
-        function contactAdmin() { window.open(`https://wa.me/${ADMIN_PHONE}`, '_blank'); }
+        function contactAdmin() {
+    let message = "";
+
+    if (currentUser) {
+        // Cas : L'élève est connecté -> Message commercial de vente
+        message = `Bonjour, c'est *${currentUser.nom}* (Classe: ${currentUser.classe}).\n` +
+                  `Mon Identifiant est : *${currentUser.id}*.\n\n` +
+                  `Je souhaite activer mon *Pack Premium* pour accéder à toutes les vidéos et exercices corrigés. 🚀\n` +
+                  `Quels sont les moyens de paiement ?`;
+    } else {
+        // Cas : Visiteur non connecté -> Message de curiosité
+        message = `Bonjour, je suis intéressé par les cours de SVT Excellence.\n` +
+                  `Pouvez-vous m'expliquer comment s'inscrire et comment ça marche ?`;
+    }
+
+    // Ouverture de WhatsApp avec le message encodé
+    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+}
         function showStatus(id) { hideAllStatus(); document.getElementById('statusContainer').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); document.getElementById('coursesGrid').classList.add('hidden'); }
         function hideAllStatus() { document.getElementById('statusContainer').classList.add('hidden'); document.getElementById('loader').classList.add('hidden'); document.getElementById('noResults').classList.add('hidden'); document.getElementById('coursesGrid').classList.remove('hidden'); }
         function showToast(m, t='info') {
