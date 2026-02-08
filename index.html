@@ -860,11 +860,30 @@ Merci de m'envoyer mon code d'accès.`;
                 if (currentAuthMode === 'signup') {
                     const nom = document.getElementById('regFullName').value.trim(), classe = document.getElementById('regClasse').value;
                     if (!nom || !classe) throw new Error("Champs manquants.");
-                    const id = generateEleveID();
-                    const { error } = await sbClient.from('eleves').insert([{ id, nom, classe, actif: false }]);
-                    if (error) throw error;
-                    showToast(`Compte créé ! ID: ${id}`, "success");
-                    setTimeout(() => { window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(`ID: ${id}`)}`, '_blank'); closeAuthModal(); }, 1500);
+                    const fullName = document.getElementById('regFullName').value.trim();
+const classe = document.getElementById('regClasse').value;
+
+if (!fullName || !classe) {
+    showToast("Merci de remplir tous les champs.", "error");
+    return;
+}
+
+// Sauvegarde minimale (sans code)
+await sbClient.from('eleves').insert([
+    { nom: fullName, classe: classe, actif: false }
+]);
+
+showToast(
+    "Inscription enregistrée. Envoie le message WhatsApp pour recevoir ton code d’accès.",
+    "info"
+);
+
+// OBLIGATION WhatsApp
+sendWhatsappInscription(fullName, classe);
+
+// Fermer le modal
+closeAuthModal();
+
                 } else {
                     const id = document.getElementById('loginID').value.toUpperCase().trim();
                     if (id.length < 4) throw new Error("ID invalide.");
