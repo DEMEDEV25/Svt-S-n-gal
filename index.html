@@ -1,11 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SVT Excellence</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVT Excellence Premium</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Bienvenue sur SVT Excellence!</h1>
-    <button onclick="window.open('https://wa.me/?text=Salut!%20👋%20J'ai%20créé%20mon%20compte%20SVT%20Excellence%20avec%20l%27ID:%20${id}.%20Je%20voudrais%20activer%20mon%20accès%20Premium%20pour%20débloquer%20tous%20les%20cours,%20vidéos%20et%20exercices%20corrigés.%20Pouvez-vous%20m'aider?%20Merci!%20🎓');">Inscription</button>
-    <button onclick="window.open('https://wa.me/?text=Bonjour!%20👋%20Je%20souhaite%20passer%20à%20l'accès%20Premium%20SVT%20Excellence%20(1000F/mois)%20pour%20débloquer%20l'intégralité%20des%20ressources%20pédagogiques:%20cours%20structurés,%20vidéos%20explicatives%20HD,%20exercices%20corrigés%20et%20schémas%20professionnels.%20Pouvez-vous%20activer%20mon%20compte?%20Merci%20de%20votre%20confiance!%20🌟📚');">Contacter l'admin</button>
+<body class="bg-gray-100">
+    <header class="bg-blue-600 p-4 text-white text-center">
+        <h1 class="text-2xl font-bold">Welcome to SVT Excellence Premium</h1>
+    </header>
+    <main class="p-4">
+        <section>
+            <h2 class="text-xl font-semibold">Enjoy Premium Learning</h2>
+            <p class="my-2">For only 1000F/month, gain access to structured courses, HD videos, solved exercises, and professional schemes!</p>
+            <button onclick="contactAdmin()" class="bg-green-500 text-white px-4 py-2 rounded">Contact Us</button>
+        </section>
+        <section class="mt-4">
+            <h2 class="text-xl font-semibold">Features</h2>
+            <ul class="list-disc list-inside">
+                <li>Structured Courses</li>
+                <li>HD Video Content</li>
+                <li>Corrected Exercises</li>
+                <li>Professional Schematics</li>
+            </ul>
+        </section>
+    </main>
+    <footer class="bg-blue-600 p-4 text-white text-center">
+        <p>© 2026 SVT Excellence. All rights reserved.</p>
+    </footer>
+    <script>
+        function contactAdmin() {
+            const message = "Hello! I'm interested in SVT Excellence Premium, which offers a lot of great benefits for 1000F/month, including structured courses, HD videos, solved exercises, and professional schemes. Please provide me more information!";
+            window.open(`https://wa.me/your_number?text=${encodeURIComponent(message)}`, '_blank');
+        }
+    </script>
 </body>
 </html>
