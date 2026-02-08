@@ -565,8 +565,30 @@
                 grid.appendChild(card);
             });
         }
+        //Ajout
+         function sendWhatsappInscription(fullName, classe) {
+    if (!fullName || !classe) {
+        showToast("Nom et niveau requis.", "error");
+        return;
+    }
+
+    const message = 
+`Inscription SVT Excellence
+Nom complet : ${fullName}
+Niveau : ${classe}
+
+Merci de m'envoyer mon code d'accès.`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${ADMIN_PHONE}?text=${encodedMessage}`;
+
+    // Oblige l'ouverture de WhatsApp
+    window.open(whatsappUrl, "_blank");
+}
+
 
         // --- ACCESS CONTROL & QUIZ LOGIC ---
+        
 
         function handleAccess(url, isPremium) {
             if (!url || url === 'null') { showToast("Ce contenu sera bientôt disponible.", "info"); return; }
