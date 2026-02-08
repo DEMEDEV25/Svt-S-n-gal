@@ -482,7 +482,10 @@
             updateUIForUser();
             showStatus('loader');
             try {
-                const { data, error } = await sbClient.from('cours').select('*, cours_objectifs(*)');
+                const { data, error } = await sbClient
+    .from('cours')
+    .select('*, cours_objectifs(*)')
+    .order('id', { ascending: true }); // Classe par ID (1, 2, 3...)
                 if (error) throw error;
                 allCourses = data || [];
                 if (allCourses.length === 0) showStatus('noResults');
