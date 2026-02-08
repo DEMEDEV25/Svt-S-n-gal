@@ -811,18 +811,36 @@
         }
         function resetFilters() { searchQuery = ''; document.getElementById('searchInput').value = ''; document.querySelector('[data-filter="all"]').click(); }
         function updateUIForUser() {
-            const authBtns = document.getElementById('navAuthButtons'), userDisplay = document.getElementById('navUserDisplay'), banner = document.getElementById('welcomeBanner');
-            if (currentUser) {
-                authBtns.classList.add('hidden'); userDisplay.classList.remove('hidden'); banner.classList.remove('hidden');
-                const initials = currentUser.nom.charAt(0).toUpperCase();
-                document.getElementById('userNameNav').innerText = currentUser.nom.split(' ')[0];
-                document.getElementById('userClassNav').innerText = currentUser.classe;
-                document.getElementById('userInitialNav').innerText = initials;
-                document.getElementById('welcomeUserText').innerText = `${currentUser.nom}`;
-                document.getElementById('userInitial').innerText = initials;
-                document.getElementById('motivationQuote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
-            } else { authBtns.classList.remove('hidden'); userDisplay.classList.add('hidden'); banner.classList.add('hidden'); }
-        }
+    const authBtns = document.getElementById('navAuthButtons');
+    const userDisplay = document.getElementById('navUserDisplay');
+    const banner = document.getElementById('welcomeBanner');
+    const heroCTA = document.getElementById('heroCTA'); // On récupère le bloc
+
+    if (currentUser) {
+        // L'utilisateur est connecté
+        authBtns.classList.add('hidden');
+        userDisplay.classList.remove('hidden');
+        banner.classList.remove('hidden');
+        
+        if (heroCTA) heroCTA.classList.add('hidden'); // On cache le bouton Commencer
+        
+        // ... reste du code (initiales, nom, etc.) ...
+        const initials = currentUser.nom.charAt(0).toUpperCase();
+        document.getElementById('userNameNav').innerText = currentUser.nom.split(' ')[0];
+        document.getElementById('userClassNav').innerText = currentUser.classe;
+        document.getElementById('userInitialNav').innerText = initials;
+        document.getElementById('welcomeUserText').innerText = `${currentUser.nom}`;
+        document.getElementById('userInitial').innerText = initials;
+        document.getElementById('motivationQuote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+    } else {
+        // L'utilisateur est déconnecté
+        authBtns.classList.remove('hidden');
+        userDisplay.classList.add('hidden');
+        banner.classList.add('hidden');
+        
+        if (heroCTA) heroCTA.classList.remove('hidden'); // On réaffiche le bouton Commencer
+    }
+}
         function showAuthModal(mode) {
             currentAuthMode = mode; document.getElementById('authModal').classList.remove('hidden');
             const s=document.getElementById('signupFields'), l=document.getElementById('loginFields'), t=document.getElementById('authTitle'), b=document.getElementById('authBtnLabel'), ft=document.getElementById('authFooterText'), fb=document.getElementById('authFooterBtn');
