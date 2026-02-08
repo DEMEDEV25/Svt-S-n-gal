@@ -852,40 +852,76 @@
         }
         function toggleAuthMode() { showAuthModal(currentAuthMode === 'login' ? 'signup' : 'login'); }
         function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-        async function handleAuth(e) {
-            e.preventDefault(); const btn = document.getElementById('authSubmitBtn'); const orig = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Traitement...';
-            try {
-                if (currentAuthMode === 'signup') {
-                    const nom = document.getElementById('regFullName').value.trim(), classe = document.getElementById('regClasse').value;
-                    if (!nom || !classe) throw new Error("Champs manquants.");
-                    const id = generateEleveID();
-                    const { error } = await sbClient.from('eleves').insert([{ id, nom, classe, actif: false }]);
-                    if (error) throw error;
-                    showToast(`Compte créé ! ID: ${id}`, "success");
+async function handleAuth(e) {
+    e.preventDefault(); 
+    const btn = document.getElementById('authSubmitBtn'); 
+    const orig = btn.innerHTML;
+    btn.disabled = true; 
+    btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Traitement...';
 
-// Création du message commercial personnalisé
-const whatsappMsg = `Salut la team SVT Excellence ! 👋\n\n` +
-                    `Je viens de créer mon compte.\n` +
-                    `👤 Nom complet : *${nom}* \n` +
-                    `🏫 Classe : *${classe}*\n` +
-                    `🔑 Mon ID unique : *${id}*\n\n` +
-                    `Je voudrais valider mon inscription pour commencer à réviser.`;
+    try {
+        if (currentAuthMode === 'signup') {
+            const nom = document.getElementById('regFullName').value.trim();
+            const classe = document.getElementById('regClasse').value;
 
-setTimeout(() => { 
-    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(whatsappMsg)}`, '_blank'); 
-    closeAuthModal(); 
-}, 1500);
-                } else {
-                    const id = document.getElementById('loginID').value.toUpperCase().trim();
-                    if (id.length < 4) throw new Error("ID invalide.");
-                    const { data, error } = await sbClient.from('eleves').select('*').eq('id', id).single();
-                    if (error || !data) throw new Error("ID introuvable.");
-                    currentUser = data; localStorage.setItem('svt_user_session', JSON.stringify(data));
-                    showToast(`Bienvenue ${data.nom.split(' ')[0]}`, "success"); updateUIForUser(); closeAuthModal(); render();
-                }
-            } catch (err) { showToast(err.message, "error"); } finally { btn.disabled = false; btn.innerHTML = orig; }
+            // 1. Vérification des champs vides
+            if (!nom || !classe) throw new Error("Champs manquants.");
+
+            // 2. Forcer Prénom ET Nom (au moins deux mots)
+            const nameParts = nom.split(' ').filter(p => p.length > 0);
+            if (nameParts.length < 2) {
+                throw new Error("Veuillez entrer votre prénom ET votre nom complet.");
+            }
+
+            // 3. Vérification des doublons dans Supabase
+            const { data: existingUser, error: checkError } = await sbClient
+                .from('eleves')
+                .select('id')
+                .ilike('nom', nom) // 'ilike' pour ignorer la casse (Majuscules/Minuscules)
+                .maybeSingle();
+
+            if (checkError) throw checkError;
+            if (existingUser) {
+                throw new Error("Ce nom est déjà inscrit. Si c'est vous, contactez l'admin ou ajoutez un 2ème prénom.");
+            }
+
+            // 4. Création du compte si tout est OK
+            const id = generateEleveID();
+            const { error } = await sbClient.from('eleves').insert([{ id, nom, classe, actif: false }]);
+            
+            if (error) throw error;
+
+            showToast(`Compte créé ! ID: ${id}`, "success");
+            
+            // Message WhatsApp personnalisé (commercial)
+            const whatsappMsg = `Salut SVT Excellence ! 👋\n\n` +
+                                `Je viens de créer mon compte.\n` +
+                                `👤 Nom complet : *${nom}* \n` +
+                                `🏫 Classe : *${classe}*\n` +
+                                `🔑 Mon ID unique : *${id}*\n\n` +
+                                `Je voudrais valider mon inscription.`;
+
+            setTimeout(() => { 
+                window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(whatsappMsg)}`, '_blank'); 
+                closeAuthModal(); 
+            }, 1500);
+
+        } else {
+            // ... (le reste du code pour la connexion reste inchangé)
+            const id = document.getElementById('loginID').value.toUpperCase().trim();
+            if (id.length < 4) throw new Error("ID invalide.");
+            const { data, error } = await sbClient.from('eleves').select('*').eq('id', id).single();
+            if (error || !data) throw new Error("ID introuvable.");
+            currentUser = data; localStorage.setItem('svt_user_session', JSON.stringify(data));
+            showToast(`Bienvenue ${data.nom.split(' ')[0]}`, "success"); updateUIForUser(); closeAuthModal(); render();
         }
+    } catch (err) { 
+        showToast(err.message, "error"); 
+    } finally { 
+        btn.disabled = false; 
+        btn.innerHTML = orig; 
+    }
+}
         function generateEleveID() { const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c.charAt(Math.floor(Math.random()*c.length)); return r; }
         function logout() { localStorage.removeItem('svt_user_session'); currentUser = null; updateUIForUser(); showToast("Déconnecté", "info"); render(); }
         function showPremiumModal(t, m) { document.getElementById('premiumModalTitle').innerText = t; document.getElementById('premiumModalMsg').innerText = m; document.getElementById('premiumModal').classList.remove('hidden'); }
