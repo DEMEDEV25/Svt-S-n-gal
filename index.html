@@ -842,7 +842,19 @@
                     const { error } = await sbClient.from('eleves').insert([{ id, nom, classe, actif: false }]);
                     if (error) throw error;
                     showToast(`Compte créé ! ID: ${id}`, "success");
-                    setTimeout(() => { window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(`ID: ${id}`)}`, '_blank'); closeAuthModal(); }, 1500);
+
+// Création du message commercial personnalisé
+const whatsappMsg = `Salut la team SVT Excellence ! 👋\n\n` +
+                    `Je viens de créer mon compte.\n` +
+                    `👤 Nom complet : *${nom}* \n` +
+                    `🏫 Classe : *${classe}*\n` +
+                    `🔑 Mon ID unique : *${id}*\n\n` +
+                    `Je voudrais valider mon inscription pour commencer à réviser.`;
+
+setTimeout(() => { 
+    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(whatsappMsg)}`, '_blank'); 
+    closeAuthModal(); 
+}, 1500);
                 } else {
                     const id = document.getElementById('loginID').value.toUpperCase().trim();
                     if (id.length < 4) throw new Error("ID invalide.");
