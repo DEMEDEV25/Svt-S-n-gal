@@ -100,13 +100,22 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <div id="navAuthButtons" class="flex items-center gap-2">
-                    <button onclick="showAuthModal('login')" class="hidden md:block text-slate-600 font-bold text-sm hover:text-brand-600 px-4 py-2 transition">Connexion</button>
-                    <button onclick="showAuthModal('signup')" class="bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-brand-100 hover:bg-brand-700 hover:shadow-brand-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
-                        <span class="hidden md:inline">S'inscrire</span>
-                        <span class="md:hidden"><i class="fas fa-user-plus"></i></span>
-                    </button>
-                </div>
+<div id="navAuthButtons" class="flex items-center gap-2">
+    <button onclick="orderManual()" class="hidden lg:flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-xl font-bold text-xs border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition shadow-sm mr-2 animate-pulse-slow">
+        <i class="fas fa-book-open"></i>
+        <span>Commander le Manuel</span>
+    </button>
+    
+    <button onclick="orderManual()" class="lg:hidden text-amber-600 w-10 h-10 flex items-center justify-center rounded-full bg-amber-50 border border-amber-100 mr-1">
+        <i class="fas fa-book"></i>
+    </button>
+
+    <button onclick="showAuthModal('login')" class="hidden md:block text-slate-600 font-bold text-sm hover:text-brand-600 px-4 py-2 transition">Connexion</button>
+    <button onclick="showAuthModal('signup')" class="bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-brand-100 hover:bg-brand-700 hover:shadow-brand-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
+        <span class="hidden md:inline">S'inscrire</span>
+        <span class="md:hidden"><i class="fas fa-user-plus"></i></span>
+    </button>
+</div>
                 <div id="navUserDisplay" class="hidden flex items-center gap-3 animate-slide-up">
                     <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
                         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white" id="userInitialNav">?</div>
@@ -942,6 +951,21 @@ async function handleAuth(e) {
     }
 
     // Ouverture de WhatsApp avec le message encodé
+    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+}
+        // --- AJOUTER CETTE FONCTION DANS LE SCRIPT ---
+
+function orderManual() {
+    // Le message WhatsApp pré-rempli
+    const message = `Bonjour SVT Excellence ! 👋\n\n` +
+                    `Je suis intéressé par le manuel *Le Dompteur des Sciences de la Vie et de la Terre* 📘.\n\n` +
+                    `Je sais qu'il contient :\n` +
+                    `✅ Les épreuves du BAC corrigées\n` +
+                    `✅ Des fiches de synthèse (Neuro, Immuno, Génétique...)\n` +
+                    `✅ Des schémas et analyses de documents\n\n` +
+                    `Je souhaite le commander. Quel est le prix et comment se passe la livraison ?`;
+
+    // Ouverture de WhatsApp
     window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
 }
         function showStatus(id) { hideAllStatus(); document.getElementById('statusContainer').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); document.getElementById('coursesGrid').classList.add('hidden'); }
