@@ -514,8 +514,25 @@
             let filtered = allCourses.filter(c => {
                 const matchesSearch = c.titre.toLowerCase().includes(searchQuery.toLowerCase());
                 let matchesCategory = true;
-                if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
-                else if (currentFilter !== 'all') matchesCategory = c.classe === currentFilter;
+
+                // --- NOUVELLE LOGIQUE DE FILTRAGE ---
+                if (currentUser) {
+                    // 1. Si l'élève est connecté :
+                    // On vérifie d'abord si le cours correspond STRICTEMENT à sa classe
+                    if (c.classe !== currentUser.classe) {
+                        matchesCategory = false;
+                    } else {
+                        // Si c'est sa classe, on autorise le filtre "Gratuit" si activé
+                        if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
+                        // Sinon (si filter est 'all', 'Terminale' ou '3ème'), on laisse passer car la classe est déjà bonne
+                    }
+                } else {
+                    // 2. Si visiteur (pas connecté) : Comportement classique avec les boutons
+                    if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
+                    else if (currentFilter !== 'all') matchesCategory = c.classe === currentFilter;
+                }
+                // -------------------------------------
+
                 return matchesSearch && matchesCategory;
             });
 
