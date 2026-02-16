@@ -589,7 +589,7 @@
         function checkPremiumLock(isPremium) {
             if (isPremium) {
                 if (!currentUser) { showAuthModal('login'); showToast("Connecte-toi pour voir ce contenu.", "warning"); return true; }
-                if (!currentUser.actif) { showPremiumModal("Contenu Verrouillé", "Passe en Premium pour 1000F."); return true; }
+                if (!currentUser.actif) { showPremiumModal("Contenu Verrouillé", "Passe en Premium pour 2000F."); return true; }
             }
             return false;
         }
