@@ -165,18 +165,6 @@
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight">
                     L'Excellence scientifique à portée de main.
                 </h1>
-                <p class="text-slate-600 text-lg md:text-xl mb-8 leading-relaxed font-medium max-w-xl mx-auto lg:mx-0">
-                    Accède aux meilleures ressources pour le <span class="font-bold text-slate-900">BAC</span> et le <span class="font-bold text-slate-900">BFEM</span>. Cours, Quiz, <span class="text-brand-600 font-bold">Exercices Corrigés</span> et Annales.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-                    <button onclick="showAuthModal('signup')" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-brand-600 transition-colors shadow-xl shadow-slate-200">
-                        Créer un compte gratuit
-                    </button>
-                    <button onclick="showPremiumOptionsModal()" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold text-sm hover:bg-slate-50 transition-colors shadow-sm">
-                        Voir les tarifs
-                    </button>
-                </div>
             </div>
 
             <!-- Search & Filter Card -->
@@ -571,28 +559,50 @@
             showStatus('loader');
             
             try {
-                // Fetch cours
-                const { data: coursData, error: coursError } = await sbClient
-                    .from('cours')
-                    .select('*, cours_objectifs(*)')
-                    .order('id', { ascending: true });
-                    
-                if (coursError) throw coursError;
+                let coursData = null;
+                let annalesData = null;
                 
-                // Polyfill for missing schema columns (backward compatibility)
-                allCourses = (coursData || []).map(c => ({
-                    ...c,
-                    matiere: c.matiere || 'SVT', 
-                    url_exos: c.url_exos || null
-                }));
+                // Optimisation Bande Passante: Utilisation du SessionStorage pour éviter les requêtes répétitives
+                const cachedCours = sessionStorage.getItem('sb_cache_cours');
+                const cachedAnnales = sessionStorage.getItem('sb_cache_annales');
+                
+                if (cachedCours && cachedAnnales) {
+                    coursData = JSON.parse(cachedCours);
+                    annalesData = JSON.parse(cachedAnnales);
+                } else {
+                    // Optimisation Bande Passante: Sélection stricte des colonnes nécessaires (sans numero_ordre pour éviter l'erreur de colonne inexistante)
+                    const [coursRes, annalesRes] = await Promise.all([
+                        sbClient.from('cours').select('id, titre, matiere, classe, type_acces, url_vid, url_exos, url_pdf, icone, ordre, cours_objectifs(description)'),
+                        sbClient.from('annales').select('id, titre, prix, url_pdf, matiere').order('date_ajout', { ascending: false })
+                    ]);
+                    
+                    if (coursRes.error) throw coursRes.error;
+                    if (annalesRes.error) throw annalesRes.error;
+                    
+                    coursData = coursRes.data;
+                    annalesData = annalesRes.data;
+                    
+                    try {
+                        sessionStorage.setItem('sb_cache_cours', JSON.stringify(coursData));
+                        sessionStorage.setItem('sb_cache_annales', JSON.stringify(annalesData));
+                    } catch(e) { console.warn("Cache storage full"); }
+                }
+                
+                allCourses = (coursData || []).map(c => {
+                    let orderValue = 9999;
+                    if (c.ordre !== undefined && c.ordre !== null) orderValue = Number(c.ordre);
+                    
+                    return {
+                        ...c,
+                        matiere: c.matiere || 'SVT', 
+                        url_exos: c.url_exos || null,
+                        ordre: isNaN(orderValue) ? 9999 : orderValue
+                    };
+                }).sort((a, b) => {
+                    if (a.ordre !== b.ordre) return a.ordre - b.ordre;
+                    return a.id > b.id ? 1 : -1; 
+                });
 
-                // Fetch annales
-                const { data: annalesData, error: annalesError } = await sbClient
-                    .from('annales')
-                    .select('*')
-                    .order('date_ajout', { ascending: false });
-
-                if (annalesError) console.error("Erreur Annales:", annalesError);
                 allAnnales = (annalesData || []).map(a => ({
                     ...a,
                     matiere: a.matiere || 'SVT'
@@ -694,7 +704,7 @@
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-6">
-                        <div class="w-14 h-14 ${iconColor} rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors duration-300">
+                        <div class="w-14 h-14 ${iconColor} rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors duration-300 relative">
                             <i class="fas ${course.icone || iconClass}"></i>
                         </div>
                         <span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide border ${isPremium ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}">
@@ -996,7 +1006,8 @@
                     const id = document.getElementById('loginID').value.toUpperCase().trim();
                     if (id.length < 4) throw new Error("ID invalide.");
                     
-                    const { data, error } = await sbClient.from('eleves').select('*').eq('id', id).single();
+                    // Optimisation Bande Passante
+                    const { data, error } = await sbClient.from('eleves').select('id, nom, classe, actif, abonnements, date_expiration, device_id').eq('id', id).single();
                     if (error || !data) throw new Error("ID introuvable.");
 
                     const currentDeviceId = getDeviceID();
