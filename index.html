@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVT Excellence | Réussir le BAC & BFEM</title>
-    <meta name="description" content="La plateforme n°1 pour exceller en SVT au Sénégal. Cours, vidéos et exercices pour Terminale et 3ème.">
+    <title>Excellence Académie | SVT, Maths & PC au Sénégal</title>
+    <meta name="description" content="La plateforme n°1 pour exceller en SVT, Mathématiques et Physique-Chimie au Sénégal. Cours, vidéos et exercices pour Terminale et 3ème.">
     
     <!-- Bibliothèques -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,14 +21,13 @@
                     colors: {
                         brand: {
                             50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a'
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#0f172a'
                         },
-                        quiz: {
-                            50: '#f5f3ff', 100: '#ede9fe', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9'
-                        },
-                        accent: {
-                            500: '#f59e0b', 600: '#d97706' // Amber for premium
-                        }
+                        svt: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669' },
+                        maths: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#dc2626' },
+                        pc: { 50: '#f5f3ff', 100: '#ede9fe', 500: '#8b5cf6', 600: '#7c3aed' },
+                        quiz: { 50: '#f5f3ff', 100: '#ede9fe', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9' },
+                        accent: { 500: '#f59e0b', 600: '#d97706' }
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -70,7 +69,6 @@
         .correct-answer { border-color: #10b981 !important; background-color: #ecfdf5 !important; color: #065f46 !important; }
         .wrong-answer { border-color: #ef4444 !important; background-color: #fef2f2 !important; color: #991b1b !important; }
         
-        /* Smooth transitions for quiz questions */
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -79,57 +77,56 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Subject active states */
+        .subject-tab.active-svt { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39); }
+        .subject-tab.active-maths { background-color: #dc2626; color: white; border-color: #dc2626; box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.39); }
+        .subject-tab.active-pc { background-color: #7c3aed; color: white; border-color: #7c3aed; box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.39); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col">
 
-    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <!-- TOAST NOTIFICATIONS -->
     <div id="toastContainer" class="fixed top-24 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- NAVIGATION -->
     <nav class="glass-nav sticky top-0 z-50 px-6 py-4 transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.reload()">
-                <div class="bg-gradient-to-br from-brand-600 to-brand-700 p-2.5 rounded-xl text-white shadow-lg shadow-brand-200 group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-dna text-xl"></i>
+                <div class="bg-gradient-to-br from-brand-900 to-slate-800 p-2.5 rounded-xl text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-graduation-cap text-xl"></i>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-xl font-extrabold tracking-tight text-slate-900 leading-none">SVT<span class="text-brand-600">Excellence</span></span>
+                    <span class="text-xl font-extrabold tracking-tight text-slate-900 leading-none">Excellence<span class="text-brand-600">Académie</span></span>
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sénégal</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-<div id="navAuthButtons" class="flex items-center gap-2">
-    <button onclick="orderManual()" class="hidden lg:flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-xl font-bold text-xs border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition shadow-sm mr-2 animate-pulse-slow">
-        <i class="fas fa-book-open"></i>
-        <span>Commander le Manuel</span>
-    </button>
-    
-    <button onclick="orderManual()" class="lg:hidden text-amber-600 w-10 h-10 flex items-center justify-center rounded-full bg-amber-50 border border-amber-100 mr-1">
-        <i class="fas fa-book"></i>
-    </button>
+                <div id="navAuthButtons" class="flex items-center gap-2">
+                    <button onclick="orderManual()" class="hidden lg:flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-xl font-bold text-xs border border-amber-200 hover:bg-amber-100 transition shadow-sm mr-2 animate-pulse-slow">
+                        <i class="fas fa-book-open"></i> Commander le Manuel
+                    </button>
+                    <button onclick="showAuthModal('login')" class="hidden md:block text-slate-600 font-bold text-sm hover:text-brand-600 px-4 py-2 transition">Connexion</button>
+                    <button onclick="showAuthModal('signup')" class="bg-brand-900 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-slate-200 hover:bg-brand-700 transition transform hover:-translate-y-0.5 active:translate-y-0">
+                        <span class="hidden md:inline">S'inscrire</span>
+                        <span class="md:hidden"><i class="fas fa-user-plus"></i></span>
+                    </button>
+                </div>
 
-    <button onclick="showAuthModal('login')" class="hidden md:block text-slate-600 font-bold text-sm hover:text-brand-600 px-4 py-2 transition">Connexion</button>
-    <button onclick="showAuthModal('signup')" class="bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-brand-100 hover:bg-brand-700 hover:shadow-brand-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
-        <span class="hidden md:inline">S'inscrire</span>
-        <span class="md:hidden"><i class="fas fa-user-plus"></i></span>
-    </button>
-</div>
                 <div id="navUserDisplay" class="hidden flex items-center gap-3 animate-slide-up">
-    <div id="subscriptionStatus" class="hidden"></div>
-
-    <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white" id="userInitialNav">?</div>
-        <div class="hidden md:flex flex-col">
-            <span id="userNameNav" class="text-xs font-bold text-slate-800 max-w-[100px] truncate leading-none">Utilisateur</span>
-            <span id="userClassNav" class="text-[9px] font-bold text-slate-400 uppercase tracking-wide leading-none mt-0.5">Classe</span>
-        </div>
-    </div>
-    <button onclick="logout()" class="text-slate-400 hover:text-red-500 hover:bg-red-50 w-10 h-10 flex items-center justify-center rounded-full transition border border-transparent hover:border-red-100" title="Déconnexion">
-        <i class="fas fa-power-off"></i>
-    </button>
-</div>
+                    <div id="subscriptionStatus" class="hidden"></div>
+                    <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white" id="userInitialNav">?</div>
+                        <div class="hidden md:flex flex-col">
+                            <span id="userNameNav" class="text-xs font-bold text-slate-800 max-w-[100px] truncate leading-none">Utilisateur</span>
+                            <span id="userClassNav" class="text-[9px] font-bold text-slate-400 uppercase tracking-wide leading-none mt-0.5">Classe</span>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="text-slate-400 hover:text-red-500 hover:bg-red-50 w-10 h-10 flex items-center justify-center rounded-full transition border border-transparent hover:border-red-100" title="Déconnexion">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -155,66 +152,50 @@
     </div>
 
     <!-- HERO SECTION -->
-    <header class="bg-white border-b border-slate-200/60 px-6 py-16 md:py-24 relative overflow-hidden">
-        <!-- Abstract Background Shapes -->
-        <div class="absolute top-10 right-0 md:right-20 w-72 h-72 bg-purple-100 rounded-full blur-[100px] opacity-60 animate-float"></div>
+    <header class="bg-white border-b border-slate-200/60 px-6 py-12 md:py-20 relative overflow-hidden">
+        <div class="absolute top-10 right-0 md:right-20 w-72 h-72 bg-blue-50 rounded-full blur-[100px] opacity-60 animate-float"></div>
         <div class="absolute bottom-0 left-0 md:left-20 w-96 h-96 bg-brand-50 rounded-full blur-[120px] opacity-70"></div>
         
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
             <div class="lg:w-1/2 text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-1.5 rounded-full text-[11px] font-black mb-6 border border-brand-100 tracking-wider uppercase shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
-                    <!-- compteur -->
-                    <span id="monCompteur" class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
-                        Chargement...
-                    </span>
+                    <span>SVT • MATHS • PHYSIQUE-CHIMIE</span>
                 </div>
-                <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight">
-                    L'Excellence en SVT à portée de main.
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight">
+                    L'Excellence scientifique à portée de main.
                 </h1>
                 <p class="text-slate-600 text-lg md:text-xl mb-8 leading-relaxed font-medium max-w-xl mx-auto lg:mx-0">
-                    Accède aux meilleures ressources pour le <span class="font-bold text-slate-900">BAC</span> et le <span class="font-bold text-slate-900">BFEM</span>. Cours structurés, schémas HD et Quiz interactifs.
+                    Accède aux meilleures ressources pour le <span class="font-bold text-slate-900">BAC</span> et le <span class="font-bold text-slate-900">BFEM</span>. Cours, Quiz, <span class="text-brand-600 font-bold">Exercices Corrigés</span> et Annales.
                 </p>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-                    <div id="heroCTA" class="p-1.5 pl-5 pr-2 bg-white rounded-full border border-slate-200 shadow-xl flex items-center gap-4 max-w-md w-full sm:w-auto hover:border-brand-300 transition-colors cursor-default">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Prix unique</span>
-                            <span class="text-xl font-black text-slate-900">2000 FCFA <span class="text-sm text-slate-400 font-medium">/mois</span></span>
-                        </div>
-                        <button onclick="showAuthModal('signup')" class="ml-auto bg-slate-900 text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-brand-600 transition-colors">
-                            Commencer
-                        </button>
-                    </div>
+                    <button onclick="showAuthModal('signup')" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-brand-600 transition-colors shadow-xl shadow-slate-200">
+                        Créer un compte gratuit
+                    </button>
+                    <button onclick="showPremiumOptionsModal()" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold text-sm hover:bg-slate-50 transition-colors shadow-sm">
+                        Voir les tarifs
+                    </button>
                 </div>
-                <p class="mt-4 text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center justify-center lg:justify-start gap-2">
-                    <i class="fas fa-check-circle text-emerald-500"></i> Inscription Gratuite
-                    <span class="mx-2">•</span>
-                    <i class="fas fa-check-circle text-emerald-500"></i> Accès Immédiat
-                </p>
             </div>
 
             <!-- Search & Filter Card -->
             <div class="lg:w-5/12 w-full">
-                <div class="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-white shadow-2xl shadow-brand-900/5 relative">
-                    <div class="absolute -top-6 -right-6 w-20 h-20 bg-accent-500 rounded-3xl rotate-12 flex items-center justify-center text-white text-3xl shadow-lg animate-float hidden md:flex">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-
+                <div class="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-slate-100 shadow-2xl shadow-brand-900/5 relative">
                     <h3 class="text-xl font-black text-slate-900 mb-6">Trouve ta leçon</h3>
                     
                     <div class="flex flex-col gap-5">
                         <div class="relative group">
                             <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors"></i>
-                            <input type="text" id="searchInput" placeholder="Ex: Mitose, Tectonique..." class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition font-semibold text-sm shadow-inner">
+                            <input type="text" id="searchInput" placeholder="Ex: Mitose, Nombres complexes..." class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition font-semibold text-sm shadow-inner">
                         </div>
                         
                         <div>
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Filtrer par niveau</p>
                             <div class="grid grid-cols-2 gap-3" id="filterContainer">
-                                <button data-filter="all" class="filter-btn active py-3 rounded-xl font-bold transition-all text-xs border border-transparent shadow-sm">Tout voir</button>
-                                <button data-filter="Terminale" class="filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-slate-200 hover:border-brand-300 bg-white text-slate-600 shadow-sm">Terminale</button>
-                                <button data-filter="3ème" class="filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-slate-200 hover:border-brand-300 bg-white text-slate-600 shadow-sm">3ème</button>
+                                <button data-filter="all" class="filter-btn active py-3 rounded-xl font-bold transition-all text-xs bg-slate-900 text-white shadow-md border border-transparent">Tout voir</button>
+                                <button data-filter="Terminale" class="filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-slate-200 hover:border-slate-300 bg-white text-slate-600 shadow-sm">Terminale</button>
+                                <button data-filter="3ème" class="filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-slate-200 hover:border-slate-300 bg-white text-slate-600 shadow-sm">3ème</button>
                                 <button data-filter="free" class="filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-sm">Gratuit</button>
                             </div>
                         </div>
@@ -225,63 +206,78 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-grow max-w-7xl mx-auto px-6 py-16 w-full">
-        <div class="flex justify-center mb-10">
-    <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm inline-flex relative">
-        <button onclick="switchView('cours')" id="tabCours" class="relative z-10 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 bg-slate-900 text-white shadow-md">
-            <i class="fas fa-play-circle mr-2"></i>Cours Vidéo
-        </button>
-        <button onclick="switchView('annales')" id="tabAnnales" class="relative z-10 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all duration-300 hover:text-amber-600 hover:bg-amber-50">
-            <i class="fas fa-book-bookmark mr-2"></i>Annales & Corrigés
-        </button>
-    </div>
+    <main class="flex-grow max-w-7xl mx-auto px-6 py-12 w-full">
+        
+        <!-- SÉLECTEUR DE MATIÈRE -->
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <button onclick="switchMatiere('SVT')" id="btnMatSVT" class="subject-tab active-svt px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 flex items-center gap-2">
+                <i class="fas fa-leaf"></i> SVT
+            </button>
+            <button onclick="switchMatiere('MATHS')" id="btnMatMaths" class="subject-tab px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 flex items-center gap-2">
+                <i class="fas fa-calculator"></i> Mathématiques
+            </button>
+            <button onclick="switchMatiere('PC')" id="btnMatPC" class="subject-tab px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 flex items-center gap-2">
+                <i class="fas fa-atom"></i> Physique-Chimie
+            </button>
         </div>
+
+        <!-- SÉLECTEUR DE TYPE DE CONTENU -->
+        <div class="flex justify-center mb-10">
+            <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm inline-flex relative">
+                <button onclick="switchView('cours')" id="tabCours" class="relative z-10 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 bg-slate-900 text-white shadow-md">
+                    <i class="fas fa-photo-video mr-2"></i>Leçons & Exos
+                </button>
+                <button onclick="switchView('annales')" id="tabAnnales" class="relative z-10 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all duration-300 hover:text-amber-600 hover:bg-amber-50">
+                    <i class="fas fa-book-bookmark mr-2"></i>Annales Corrigées
+                </button>
+            </div>
+        </div>
+
         <!-- Status & Loader -->
         <div id="statusContainer" class="hidden text-center py-20">
             <div id="loader" class="hidden flex flex-col items-center">
                 <div class="w-16 h-16 border-4 border-slate-100 border-t-brand-600 rounded-full animate-spin mb-4"></div>
-                <p class="font-bold text-slate-400 animate-pulse">Chargement des cours...</p>
+                <p class="font-bold text-slate-400 animate-pulse">Chargement...</p>
             </div>
             <div id="noResults" class="hidden text-slate-400 max-w-md mx-auto">
                 <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-search text-3xl text-slate-300"></i>
+                    <i class="fas fa-folder-open text-3xl text-slate-300"></i>
                 </div>
-                <h3 class="text-2xl font-black text-slate-800 mb-2">Aucun résultat</h3>
-                <p class="font-medium text-slate-500">Nous n'avons trouvé aucune leçon correspondant à ta recherche. Essaie un autre mot-clé.</p>
-                <button onclick="resetFilters()" class="mt-6 text-brand-600 font-bold hover:underline">Réinitialiser les filtres</button>
+                <h3 class="text-2xl font-black text-slate-800 mb-2">Aucun contenu</h3>
+                <p class="font-medium text-slate-500">Nous n'avons trouvé aucun résultat pour cette sélection ou matière. Essaie un autre mot-clé.</p>
+                <button onclick="resetFilters()" class="mt-6 text-brand-600 font-bold hover:underline">Réinitialiser</button>
             </div>
         </div>
 
         <!-- Course Grid -->
         <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Loading Skeletons -->
-            <div class="shimmer h-[380px] rounded-[2.5rem] opacity-60"></div>
-            <div class="shimmer h-[380px] rounded-[2.5rem] opacity-60"></div>
-            <div class="shimmer h-[380px] rounded-[2.5rem] opacity-60"></div>
+            <div class="shimmer h-[400px] rounded-[2.5rem] opacity-60"></div>
+            <div class="shimmer h-[400px] rounded-[2.5rem] opacity-60"></div>
+            <div class="shimmer h-[400px] rounded-[2.5rem] opacity-60"></div>
         </div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-900 text-white border-t border-slate-800 pt-16 pb-8">
+    <footer class="bg-slate-900 text-white border-t border-slate-800 pt-16 pb-8 mt-auto">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
                 <div>
                     <div class="flex items-center gap-2 mb-4">
                         <div class="bg-brand-600 p-1.5 rounded-lg text-white">
-                            <i class="fas fa-dna text-sm"></i>
+                            <i class="fas fa-graduation-cap text-sm"></i>
                         </div>
-                        <span class="text-lg font-bold">SVT Excellence</span>
+                        <span class="text-lg font-bold">Excellence Académie</span>
                     </div>
                     <p class="text-slate-400 text-sm leading-relaxed max-w-xs">
-                        La plateforme éducative de référence pour les élèves de 3ème et Terminale au Sénégal. Reussissez votre examen avec nos cours optimisés.
+                        La plateforme éducative de référence pour les élèves de 3ème et Terminale au Sénégal. Reussissez vos examens scientifiques.
                     </p>
                 </div>
                 <div>
                     <h4 class="font-bold text-lg mb-4">Liens Rapides</h4>
                     <ul class="space-y-2 text-sm text-slate-400">
-                        <li><a href="#" class="hover:text-brand-400 transition">Programme Terminale</a></li>
-                        <li><a href="#" class="hover:text-brand-400 transition">Programme 3ème</a></li>
-                        <li><a href="#" onclick="showAuthModal('signup')" class="hover:text-brand-400 transition">S'inscrire</a></li>
+                        <li><button onclick="switchMatiere('SVT')" class="hover:text-brand-400 transition">SVT</button></li>
+                        <li><button onclick="switchMatiere('MATHS')" class="hover:text-brand-400 transition">Mathématiques</button></li>
+                        <li><button onclick="switchMatiere('PC')" class="hover:text-brand-400 transition">Physique-Chimie</button></li>
                     </ul>
                 </div>
                 <div>
@@ -293,7 +289,7 @@
                 </div>
             </div>
             <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 font-medium">
-                <p>&copy; 2024 SVT Excellence Sénégal. Tous droits réservés.</p>
+                <p>&copy; 2026 Excellence Académie Sénégal. Tous droits réservés.</p>
                 <p>Fait avec <i class="fas fa-heart text-red-500 mx-1"></i> pour l'éducation.</p>
             </div>
         </div>
@@ -341,11 +337,11 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Ton Identifiant (ID)</label>
                         <input type="text" id="loginID" maxlength="4" placeholder="ABCD" class="w-full px-5 py-5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition uppercase text-center text-3xl font-black tracking-[0.5em] shadow-inner text-brand-600 placeholder-slate-300">
-                        <p class="text-center text-[10px] text-slate-400 mt-2">C'est le code à 4 lettres reçu lors de l'inscription.</p>
+                        <p class="text-center text-[10px] text-slate-400 mt-2">Le code à 4 lettres reçu lors de l'inscription.</p>
                     </div>
                 </div>
                 
-                <button type="submit" id="authSubmitBtn" class="w-full py-4 bg-brand-600 text-white rounded-xl font-bold shadow-lg shadow-brand-200 hover:bg-brand-700 hover:shadow-brand-300 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 mt-2">
+                <button type="submit" id="authSubmitBtn" class="w-full py-4 bg-brand-900 text-white rounded-xl font-bold shadow-lg shadow-slate-200 hover:bg-brand-700 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mt-2">
                     <span id="authBtnLabel">Se connecter</span>
                     <i class="fas fa-arrow-right text-xs"></i>
                 </button>
@@ -363,7 +359,6 @@
     <!-- MODAL QUIZ -->
     <div id="quizModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md transition-opacity duration-300">
         <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[90vh] animate-slide-up border border-slate-200 h-[80vh] md:h-auto">
-            <!-- Header -->
             <div class="p-6 border-b border-slate-100 flex flex-col bg-slate-50/50 rounded-t-[2rem]">
                 <div class="flex justify-between items-center mb-4">
                     <div>
@@ -377,23 +372,14 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <!-- Progress Bar -->
                 <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
                     <div id="quizProgressBar" class="bg-quiz-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
                 </div>
                 <p class="text-right text-[10px] font-bold text-slate-400 mt-1" id="questionProgressText">Question 1/5</p>
             </div>
             
-            <!-- Content (Scrollable) -->
-            <div id="quizContent" class="p-6 overflow-y-auto flex-grow relative">
-                <!-- Dynamic Questions Go Here -->
-                <div class="text-center py-10">
-                    <i class="fas fa-circle-notch animate-spin text-3xl text-brand-200"></i>
-                    <p class="mt-4 text-slate-400 font-bold">Chargement du quiz...</p>
-                </div>
-            </div>
+            <div id="quizContent" class="p-6 overflow-y-auto flex-grow relative"></div>
 
-            <!-- Footer (Actions) -->
             <div class="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-[2rem] flex justify-between items-center gap-4">
                 <div id="quizScoreBox" class="hidden opacity-0 transition-opacity duration-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Score Final</span>
@@ -401,21 +387,17 @@
                 </div>
                 
                 <div class="flex gap-3 ml-auto w-full md:w-auto justify-end" id="quizNavButtons">
-                    <!-- Navigation Buttons -->
                     <button id="btnPrev" onclick="changeQuestion(-1)" class="hidden px-5 py-3 bg-white text-slate-600 rounded-xl font-bold hover:bg-slate-100 border border-slate-200 transition">
                         <i class="fas fa-arrow-left text-xs mr-2"></i> Précédent
                     </button>
-                    
                     <button id="btnNext" onclick="changeQuestion(1)" class="hidden px-8 py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 shadow-lg shadow-brand-200 transition flex items-center gap-2">
                         <span>Suivant</span>
                         <i class="fas fa-arrow-right text-xs"></i>
                     </button>
-                    
                     <button id="btnSubmit" onclick="evaluateQuiz()" class="hidden px-8 py-3 bg-quiz-600 text-white rounded-xl font-black shadow-lg shadow-quiz-200 hover:bg-quiz-700 transition transform active:scale-95 flex items-center gap-2">
                         <span>Valider</span>
                         <i class="fas fa-check"></i>
                     </button>
-
                     <button id="btnRetry" onclick="resetCurrentQuiz()" class="hidden px-6 py-3 bg-white text-slate-700 rounded-xl font-bold hover:bg-slate-50 border border-slate-200 transition shadow-sm">
                         <i class="fas fa-redo text-xs mr-2"></i> Réessayer
                     </button>
@@ -424,30 +406,105 @@
         </div>
     </div>
 
-    <!-- MODAL PREMIUM -->
-    <div id="premiumModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md">
-        <div class="bg-white rounded-[3rem] p-8 md:p-10 max-w-md w-full shadow-2xl relative border-4 border-amber-100 animate-slide-up">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-3xl flex items-center justify-center text-3xl shadow-lg shadow-orange-200 ring-4 ring-white">
-                <i class="fas fa-crown"></i>
-            </div>
+    <!-- MODAL PREMIUM OPTIONS (NEW MULTI-SUBJECT PRICING) -->
+    <div id="premiumOptionsModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
+        <div class="bg-white rounded-[2rem] w-full max-w-4xl shadow-2xl relative animate-slide-up my-auto">
+            <button onclick="closePremiumOptionsModal()" class="absolute top-4 right-4 z-10 text-slate-400 hover:text-slate-900 transition h-10 w-10 flex items-center justify-center bg-slate-50 hover:bg-slate-100 rounded-full">
+                <i class="fas fa-times"></i>
+            </button>
             
-            <div class="mt-8 text-center">
-                <h2 id="premiumModalTitle" class="text-2xl font-black text-slate-900 mb-2">Passe au niveau supérieur</h2>
-                <div class="w-16 h-1 bg-amber-200 mx-auto rounded-full mb-4"></div>
-                <p id="premiumModalMsg" class="text-slate-600 mb-8 leading-relaxed font-medium text-sm">
-                    Débloque l'intégralité des cours, exercices corrigés et vidéos explicatives pour réussir ton année.
-                </p>
+            <div class="p-8 md:p-10 text-center border-b border-slate-100">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Passe au niveau supérieur</h2>
+                <p class="text-slate-500 font-medium">Débloque l'intégralité des cours, vidéos et <span class="font-bold text-brand-600">exercices corrigés</span>.</p>
+                <p id="premiumTargetMatiereMsg" class="mt-3 inline-block bg-amber-50 text-amber-700 font-bold px-4 py-1.5 rounded-full text-sm border border-amber-200 hidden"></p>
             </div>
 
-            <div class="space-y-3">
-                <button id="premiumWhatsappBtn" onclick="contactAdmin()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-black shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:to-emerald-500 transition flex items-center justify-center gap-3">
-                    <i class="fab fa-whatsapp text-xl"></i>
-                    <span>Activer pour 2000F / mois</span>
+            <div class="p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50">
+                <!-- Pack Solo -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-brand-300 transition-all flex flex-col">
+                    <div class="text-slate-500 text-sm font-bold uppercase tracking-wider mb-2">Pack Solo</div>
+                    <div class="text-3xl font-black text-slate-900 mb-4">2000F<span class="text-sm text-slate-400 font-medium">/mois</span></div>
+                    <ul class="space-y-3 mb-8 flex-grow text-sm text-slate-600 font-medium">
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> 1 Matière au choix</li>
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Cours & Vidéos</li>
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Exercices corrigés</li>
+                    </ul>
+                    <button onclick="orderSubscription('SOLO')" class="w-full py-3 rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Choisir Solo</button>
+                </div>
+
+                <!-- Pack Duo -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-brand-300 transition-all flex flex-col">
+                    <div class="text-slate-500 text-sm font-bold uppercase tracking-wider mb-2">Pack Duo</div>
+                    <div class="text-3xl font-black text-slate-900 mb-4">3500F<span class="text-sm text-slate-400 font-medium">/mois</span></div>
+                    <ul class="space-y-3 mb-8 flex-grow text-sm text-slate-600 font-medium">
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> 2 Matières au choix</li>
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Cours & Vidéos</li>
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Exercices corrigés</li>
+                    </ul>
+                    <button onclick="orderSubscription('DUO')" class="w-full py-3 rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Choisir Duo</button>
+                </div>
+
+                <!-- Pack Excellence (3 matières) -->
+                <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-2xl relative flex flex-col transform md:-translate-y-4">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow-lg">
+                        Le plus populaire
+                    </div>
+                    <div class="text-brand-300 text-sm font-bold uppercase tracking-wider mb-2">Pack Excellence</div>
+                    <div class="text-3xl font-black text-white mb-4">5000F<span class="text-sm text-slate-400 font-medium">/mois</span></div>
+                    <ul class="space-y-3 mb-8 flex-grow text-sm text-slate-300 font-medium">
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-brand-400 mt-0.5"></i> SVT + Maths + PC</li>
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-brand-400 mt-0.5"></i> Accès total illimité</li>
+                        <li class="flex gap-2"><i class="fas fa-check-circle text-brand-400 mt-0.5"></i> Support prioritaire</li>
+                    </ul>
+                    <button onclick="orderSubscription('EXCELLENCE')" class="w-full py-3 rounded-xl font-black bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-900/50 hover:from-brand-400 hover:to-brand-500 transition flex items-center justify-center gap-2">
+                        <i class="fab fa-whatsapp text-lg"></i> S'abonner
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CHOIX DES MATIÈRES (NOUVEAU) -->
+    <div id="subjectSelectionModal" class="hidden fixed inset-0 z-[115] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto transition-opacity duration-300">
+        <div class="bg-white rounded-[2rem] p-8 md:p-10 max-w-md w-full shadow-2xl relative animate-slide-up my-auto">
+            <button onclick="closeSubjectSelectionModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition h-10 w-10 flex items-center justify-center bg-slate-50 hover:bg-slate-100 rounded-full" title="Retour">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-black text-slate-900 leading-tight">Choisis tes matières</h2>
+                <p id="subjectSelectionSubtitle" class="text-slate-500 mt-2 font-medium text-sm">Tu as choisi le Pack ...</p>
+            </div>
+
+            <div class="space-y-3 mb-8">
+                <button onclick="toggleSubjectSelection('SVT')" id="btnSelectSVT" class="w-full p-4 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-between transition-all hover:border-brand-200 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fas fa-leaf"></i></div>
+                        <span class="font-bold text-slate-700 group-hover:text-slate-900">SVT</span>
+                    </div>
+                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 check-indicator flex items-center justify-center text-white transition-colors"></div>
                 </button>
-                <button onclick="closePremiumModal()" class="w-full py-3 bg-white text-slate-400 rounded-xl font-bold hover:bg-slate-50 hover:text-slate-600 transition text-sm">
-                    Non merci, je continue en gratuit
+                
+                <button onclick="toggleSubjectSelection('MATHS')" id="btnSelectMATHS" class="w-full p-4 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-between transition-all hover:border-brand-200 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-lg"><i class="fas fa-calculator"></i></div>
+                        <span class="font-bold text-slate-700 group-hover:text-slate-900">Mathématiques</span>
+                    </div>
+                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 check-indicator flex items-center justify-center text-white transition-colors"></div>
+                </button>
+
+                <button onclick="toggleSubjectSelection('PC')" id="btnSelectPC" class="w-full p-4 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-between transition-all hover:border-brand-200 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-atom"></i></div>
+                        <span class="font-bold text-slate-700 group-hover:text-slate-900">Physique-Chimie</span>
+                    </div>
+                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 check-indicator flex items-center justify-center text-white transition-colors"></div>
                 </button>
             </div>
+            
+            <button id="btnConfirmSubjects" onclick="confirmSubscription()" disabled class="w-full py-4 bg-brand-600 text-white rounded-xl font-bold shadow-lg opacity-50 cursor-not-allowed transition-all flex items-center justify-center gap-2">
+                <span>Continuer vers WhatsApp</span> <i class="fab fa-whatsapp text-lg"></i>
+            </button>
         </div>
     </div>
 
@@ -465,34 +522,32 @@
         let allAnnales = [];         
         let currentView = 'cours';   
         let currentFilter = 'all';
+        let currentMatiere = 'SVT'; // Default matière
         let searchQuery = '';
         let currentAuthMode = 'login';
         let currentUser = null;
+        let intendedPremiumMatiere = null;
+        
+        // Nouveaux états pour la sélection des matières
+        let currentPackToSubscribe = '';
+        let maxSubjectsAllowed = 0;
+        let selectedSubjectsForSub = [];
         
         // Quiz State
         let currentQuizData = null; 
         let currentQuestionIndex = 0;
-        let quizUserAnswers = {}; // Map: questionId -> optionId
+        let quizUserAnswers = {}; 
 
-        // Données statiques
         const quotes = [
             "Le succès est la somme de petits efforts, répétés jour après jour.",
-            "En SVT, comprendre le mécanisme c'est retenir la leçon.",
+            "Comprendre le mécanisme c'est retenir la leçon.",
             "L'excellence n'est pas un acte, mais une habitude.",
-            "Investir en toi-même rapporte toujours les meilleurs intérêts.",
             "Ton BAC se prépare dès aujourd'hui."
         ];
 
-        // --- INITIALISATION ---
         window.addEventListener('DOMContentLoaded', () => {
             try {
-                // MODIFICATION : Supprimer l'ancien localStorage s'il existe pour forcer 
-                // les anciens utilisateurs à se reconnecter et passer sur sessionStorage
-                if (localStorage.getItem('svt_user_session')) {
-                    localStorage.removeItem('svt_user_session');
-                }
-
-                // MODIFICATION : Utilisation de sessionStorage. Se détruit à la fermeture de la fenêtre/navigateur
+                if (localStorage.getItem('svt_user_session')) { localStorage.removeItem('svt_user_session'); }
                 const stored = sessionStorage.getItem('svt_user_session');
                 if (stored) currentUser = JSON.parse(stored);
             } catch (e) {
@@ -511,492 +566,400 @@
             });
         });
 
-async function init() {
+        async function init() {
             updateUIForUser();
             showStatus('loader');
             
             try {
-                // 1. Charger les cours 
+                // Fetch cours
                 const { data: coursData, error: coursError } = await sbClient
                     .from('cours')
                     .select('*, cours_objectifs(*)')
                     .order('id', { ascending: true });
                     
                 if (coursError) throw coursError;
-                allCourses = coursData || [];
+                
+                // Polyfill for missing schema columns (backward compatibility)
+                allCourses = (coursData || []).map(c => ({
+                    ...c,
+                    matiere: c.matiere || 'SVT', 
+                    url_exos: c.url_exos || null
+                }));
 
-                // 2. Charger les annales 
+                // Fetch annales
                 const { data: annalesData, error: annalesError } = await sbClient
                     .from('annales')
                     .select('*')
                     .order('date_ajout', { ascending: false });
 
                 if (annalesError) console.error("Erreur Annales:", annalesError);
-                allAnnales = annalesData || [];
+                allAnnales = (annalesData || []).map(a => ({
+                    ...a,
+                    matiere: a.matiere || 'SVT'
+                }));
 
-                // Rendu initial
                 render();
-
             } catch (err) {
                 console.error("Erreur Supabase:", err);
-                showToast("Impossible de charger le contenu.", "error");
+                showToast("Impossible de charger le contenu. Avez-vous mis à jour la BDD ?", "error");
                 showStatus('noResults');
             }
         }
 
-        // --- CORE UI FUNCTIONS ---
-function render() {
-    const grid = document.getElementById('coursesGrid');
-    if (!grid) return;
-    
-    hideAllStatus();
-    grid.innerHTML = '';
-
-    // --- CAS 1 : VUE ANNALES ---
-    if (currentView === 'annales') {
-        if (allAnnales.length === 0) {
-            showStatus('noResults'); 
-            return;
-        }
-
-        allAnnales.forEach((annale, index) => {
-            const card = document.createElement('div');
-            card.className = `bg-white rounded-[2rem] p-6 border-2 border-amber-100 flex flex-col h-full relative group hover:border-amber-300 transition-all duration-300 shadow-xl shadow-amber-900/5 animate-slide-up`;
-            card.style.animationDelay = `${index * 50}ms`;
-
-            card.innerHTML = `
-                <div class="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-md animate-pulse">
-                    OFFRE SPÉCIALE
-                </div>
-
-                <div class="flex items-start gap-4 mb-4">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-orange-200 shrink-0">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-extrabold text-slate-900 leading-tight mb-1">${annale.titre}</h3>
-                        <div class="text-2xl font-black text-amber-600">${annale.prix} F <span class="text-xs text-slate-400 font-medium line-through"> ${(annale.prix * 1.5).toFixed(0)} F</span></div>
-                    </div>
-                </div>
-
-                <div class="bg-amber-50 rounded-xl p-4 mb-6 border border-amber-100">
-                    <p class="text-xs font-bold text-amber-800 uppercase tracking-wide mb-2"><i class="fas fa-fire mr-1"></i> Pourquoi l'acheter ?</p>
-                    <p class="text-sm text-slate-700 leading-relaxed font-medium">
-                        Ne laisse pas le hasard décider de ta note ! Ce document contient les <span class="font-bold text-slate-900">corrigés types validés</span> par les correcteurs officiels. C'est l'outil ultime pour viser la mention.
-                    </p>
-                </div>
-
-                <div class="mt-auto grid grid-cols-2 gap-3">
-                    <button onclick="window.open('${annale.url_pdf}', '_blank')" class="px-4 py-3 bg-white text-slate-700 border-2 border-slate-200 rounded-xl font-bold text-xs hover:bg-slate-50 transition">
-                        <i class="fas fa-eye mr-1"></i> Voir extrait
-                    </button>
-                    <button onclick="orderAnnale('${annale.titre}', '${annale.prix}')" class="px-4 py-3 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-amber-600 shadow-lg shadow-slate-200 hover:shadow-amber-200 transition flex items-center justify-center gap-2 group-hover:scale-105 duration-200">
-                        <span>Commander</span>
-                        <i class="fab fa-whatsapp text-lg"></i>
-                    </button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-        return; 
-    }
-
-    // --- CAS 2 : VUE COURS ---
-    let filtered = allCourses.filter(c => {
-        const matchesSearch = c.titre.toLowerCase().includes(searchQuery.toLowerCase());
-        let matchesCategory = true;
-        if (currentUser) {
-            if (c.classe !== currentUser.classe) matchesCategory = false;
-            else if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
-        } else {
-            if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
-            else if (currentFilter !== 'all') matchesCategory = c.classe === currentFilter;
-        }
-        return matchesSearch && matchesCategory;
-    });
-
-    if (filtered.length === 0) {
-        showStatus('noResults');
-        return;
-    }
-
-    filtered.forEach((course, index) => {
-        const isPremium = course.type_acces === 'premium';
-        const card = document.createElement('div');
-        card.className = `course-card bg-white rounded-[2rem] p-6 border border-slate-100 flex flex-col h-full relative group animate-slide-up`;
-        card.style.animationDelay = `${index * 50}ms`;
-        
-        const objectifsHtml = (course.cours_objectifs || []).slice(0, 3).map(o => `
-            <div class="flex items-start gap-2.5 text-xs font-medium text-slate-500">
-                <i class="fas fa-check text-brand-400 mt-0.5 text-[10px]"></i>
-                <span class="leading-relaxed">${o.description}</span>
-            </div>
-        `).join('');
-
-        card.innerHTML = `
-            <div class="flex justify-between items-start mb-6">
-                <div class="w-14 h-14 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center text-xl shadow-sm group-hover:bg-brand-600 group-hover:text-white transition-colors duration-300">
-                    <i class="fas ${course.icone || 'fa-dna'}"></i>
-                </div>
-                <span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide border ${isPremium ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}">
-                    ${isPremium ? '<i class="fas fa-crown mr-1"></i> Premium' : 'Gratuit'}
-                </span>
-            </div>
-            <div class="flex-grow">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">${course.classe}</span>
-                </div>
-                <h3 class="text-xl font-extrabold text-slate-900 leading-tight mb-4 group-hover:text-brand-600 transition-colors line-clamp-2">${course.titre}</h3>
-                <div class="space-y-3 mb-6">${objectifsHtml || '<p class="text-xs text-slate-400 italic">Aucun objectif listé</p>'}</div>
-            </div>
-            <div class="grid grid-cols-3 gap-2 pt-6 border-t border-slate-50 mt-auto">
-                 <button onclick="handleAccess('${course.url_vid}', ${isPremium})" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-slate-900 text-white font-bold text-[10px] hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200"><i class="fas fa-play text-sm"></i> Vidéo</button>
-                <button onclick="handleQuizAccess('${course.id}', '${course.titre}', ${isPremium})" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-quiz-600 text-white font-bold text-[10px] hover:bg-quiz-700 transition-all active:scale-95 shadow-lg shadow-quiz-200"><i class="fas fa-brain text-sm"></i> Quiz</button>
-                <button onclick="handleAccess('${course.url_pdf}', ${isPremium})" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-slate-50 text-slate-600 font-bold text-[10px] hover:bg-slate-100 border border-slate-200 transition-all active:scale-95"><i class="fas fa-file-pdf text-sm"></i> PDF</button>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-        // --- ACCESS CONTROL & QUIZ LOGIC ---
-
-        function handleAccess(url, isPremium) {
-            if (!url || url === 'null') { showToast("Ce contenu sera bientôt disponible.", "info"); return; }
-            if (checkPremiumLock(isPremium)) return;
-            window.open(url, '_blank');
-        }
-
-        function checkPremiumLock(isPremium) {
-            if (isPremium) {
-                if (!currentUser) { 
-                    showAuthModal('login'); 
-                    showToast("Connecte-toi pour voir ce contenu.", "warning"); 
-                    return true; 
-                }
-                
-                // MODIFICATION : Vérifier non seulement si actif=true, mais aussi si la date n'est pas expirée
-                let isExpired = false;
-                if (currentUser.date_expiration) {
-                    const daysRemaining = Math.ceil((new Date(currentUser.date_expiration) - new Date()) / 86400000);
-                    if (daysRemaining <= 0) {
-                        isExpired = true;
-                    }
-                }
-
-                if (!currentUser.actif || isExpired) { 
-                    showPremiumModal("Abonnement Requis", "Ton abonnement est inactif ou a expiré. Passe en Premium ou renouvelle-le pour 2000F."); 
-                    return true; 
-                }
-            }
-            return false;
-        }
-
-        async function handleQuizAccess(courseId, courseTitle, isPremium) {
-            if (checkPremiumLock(isPremium)) return;
-
-            // Reset Quiz State
-            currentQuestionIndex = 0;
-            quizUserAnswers = {};
-            currentQuizData = null;
-
-            document.getElementById('quizTitle').innerText = "Quiz : " + courseTitle;
-            document.getElementById('quizModal').classList.remove('hidden');
-            document.getElementById('quizContent').innerHTML = `
-                <div class="text-center py-10">
-                    <i class="fas fa-circle-notch animate-spin text-3xl text-brand-200"></i>
-                    <p class="mt-4 text-slate-400 font-bold">Chargement des questions...</p>
-                </div>
-            `;
+        function render() {
+            const grid = document.getElementById('coursesGrid');
+            if (!grid) return;
             
-            // Reset UI
-            document.getElementById('quizScoreBox').classList.add('hidden');
-            document.getElementById('btnPrev').classList.add('hidden');
-            document.getElementById('btnNext').classList.add('hidden');
-            document.getElementById('btnSubmit').classList.add('hidden');
-            document.getElementById('btnRetry').classList.add('hidden');
+            hideAllStatus();
+            grid.innerHTML = '';
 
-            try {
-                const { data, error } = await sbClient
-                    .from('quiz_questions')
-                    .select(`id, question_texte, explication, quiz_options ( id, option_texte, est_correcte )`)
-                    .eq('cours_id', courseId);
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    document.getElementById('quizContent').innerHTML = `
-                        <div class="text-center py-10">
-                            <h3 class="text-lg font-bold text-slate-700">Quiz en construction</h3>
-                            <button onclick="closeQuizModal()" class="mt-6 px-6 py-2 bg-slate-200 rounded-lg">Fermer</button>
-                        </div>
-                    `;
+            // --- VUE ANNALES ---
+            if (currentView === 'annales') {
+                let filteredAnnales = allAnnales.filter(a => a.matiere === currentMatiere);
+                
+                if (filteredAnnales.length === 0) {
+                    showStatus('noResults'); 
                     return;
                 }
 
-                currentQuizData = data;
-                renderSingleQuestion(0);
+                filteredAnnales.forEach((annale, index) => {
+                    const card = document.createElement('div');
+                    card.className = `bg-white rounded-[2rem] p-6 border-2 border-amber-100 flex flex-col h-full relative group hover:border-amber-300 transition-all duration-300 shadow-xl shadow-amber-900/5 animate-slide-up`;
+                    card.style.animationDelay = `${index * 50}ms`;
 
-            } catch (err) {
-                console.error("Erreur Quiz:", err);
-                showToast("Erreur chargement quiz.", "error");
-                closeQuizModal();
-            }
-        }
-
-        function renderSingleQuestion(index) {
-            if(!currentQuizData || !currentQuizData[index]) return;
-            
-            const q = currentQuizData[index];
-            const total = currentQuizData.length;
-            
-            // Update Progress
-            const progressPercent = ((index + 1) / total) * 100;
-            document.getElementById('quizProgressBar').style.width = `${progressPercent}%`;
-            document.getElementById('questionProgressText').innerText = `Question ${index + 1}/${total}`;
-
-            // Render Question Content
-            const container = document.getElementById('quizContent');
-            
-            let optionsHtml = '';
-            q.quiz_options.forEach(opt => {
-                const isChecked = quizUserAnswers[q.id] === opt.id ? 'checked' : '';
-                optionsHtml += `
-                    <label class="option-label block relative group cursor-pointer" onclick="saveAnswer(${q.id}, ${opt.id})">
-                        <input type="radio" name="q_current" value="${opt.id}" class="option-radio absolute opacity-0 w-0 h-0 peer" ${isChecked}>
-                        <div class="option-content p-4 rounded-xl bg-white border-2 border-slate-200 text-slate-600 font-medium peer-hover:border-brand-200 peer-focus:ring-2 peer-focus:ring-brand-500 transition-all flex items-center gap-3">
-                            <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center peer-checked:border-quiz-500 peer-checked:bg-quiz-500">
-                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                    card.innerHTML = `
+                        <div class="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-md animate-pulse">OFFRE SPÉCIALE</div>
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-2xl shadow-lg shrink-0">
+                                <i class="fas fa-file-invoice-dollar"></i>
                             </div>
-                            <span>${opt.option_texte}</span>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-slate-900 leading-tight mb-1">${annale.titre}</h3>
+                                <div class="text-2xl font-black text-amber-600">${annale.prix} F <span class="text-xs text-slate-400 font-medium line-through"> ${(annale.prix * 1.5).toFixed(0)} F</span></div>
+                            </div>
                         </div>
-                    </label>
-                `;
-            });
-
-            container.innerHTML = `
-                <div class="fade-in">
-                    <p class="font-bold text-slate-800 mb-6 text-lg md:text-xl">
-                        <span class="text-quiz-500 mr-2 text-2xl font-black">Q${index + 1}.</span> 
-                        ${q.question_texte}
-                    </p>
-                    <div class="space-y-4">
-                        ${optionsHtml}
-                    </div>
-                </div>
-            `;
-
-            // Update Buttons
-            const btnPrev = document.getElementById('btnPrev');
-            const btnNext = document.getElementById('btnNext');
-            const btnSubmit = document.getElementById('btnSubmit');
-
-            if (index === 0) btnPrev.classList.add('hidden');
-            else btnPrev.classList.remove('hidden');
-
-            if (index === total - 1) {
-                btnNext.classList.add('hidden');
-                btnSubmit.classList.remove('hidden');
-            } else {
-                btnNext.classList.remove('hidden');
-                btnSubmit.classList.add('hidden');
-            }
-        }
-
-        function saveAnswer(questionId, optionId) {
-            quizUserAnswers[questionId] = optionId;
-        }
-
-        function changeQuestion(direction) {
-            const newIndex = currentQuestionIndex + direction;
-            if (newIndex >= 0 && newIndex < currentQuizData.length) {
-                currentQuestionIndex = newIndex;
-                renderSingleQuestion(newIndex);
-            }
-        }
-
-        function evaluateQuiz() {
-            if (!currentQuizData) return;
-
-            let score = 0;
-            const total = currentQuizData.length;
-            let resultHtml = '<div class="space-y-8 fade-in pb-10">';
-
-            currentQuizData.forEach((q, idx) => {
-                const userChoiceId = quizUserAnswers[q.id];
-                const correctOpt = q.quiz_options.find(o => o.est_correcte);
-                const userOpt = q.quiz_options.find(o => o.id === userChoiceId);
-                
-                let isCorrect = false;
-                if(correctOpt && userChoiceId === correctOpt.id) {
-                    score++;
-                    isCorrect = true;
-                }
-
-                // Build correction HTML for this question
-                let optionsDisplay = '';
-                q.quiz_options.forEach(opt => {
-                    let classes = "p-3 rounded-lg border border-slate-100 text-sm flex items-center gap-2";
-                    let icon = '';
-                    
-                    if (opt.id === userChoiceId && opt.est_correcte) {
-                        classes = "p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 font-bold";
-                        icon = '<i class="fas fa-check text-emerald-600 ml-auto"></i>';
-                    } else if (opt.id === userChoiceId && !opt.est_correcte) {
-                        classes = "p-3 rounded-lg border border-red-200 bg-red-50 text-red-800 font-bold";
-                        icon = '<i class="fas fa-times text-red-500 ml-auto"></i>';
-                    } else if (opt.est_correcte) {
-                        classes = "p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 font-bold opacity-80";
-                        icon = '<span class="text-[10px] bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded ml-auto">Réponse correcte</span>';
-                    }
-
-                    optionsDisplay += `<div class="${classes}">${opt.option_texte} ${icon}</div>`;
+                        <div class="mt-auto grid grid-cols-2 gap-3">
+                            <button onclick="window.open('${annale.url_pdf}', '_blank')" class="px-4 py-3 bg-white text-slate-700 border-2 border-slate-200 rounded-xl font-bold text-xs hover:bg-slate-50 transition">
+                                <i class="fas fa-eye mr-1"></i> Voir extrait
+                            </button>
+                            <button onclick="orderAnnale('${annale.titre}', '${annale.prix}')" class="px-4 py-3 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-amber-600 shadow-lg transition flex items-center justify-center gap-2">
+                                <span>Commander</span> <i class="fab fa-whatsapp text-lg"></i>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
                 });
+                return; 
+            }
 
-                resultHtml += `
-                    <div class="bg-slate-50 p-6 rounded-2xl border ${isCorrect ? 'border-emerald-100' : 'border-red-100'}">
-                        <div class="flex items-start gap-3 mb-4">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isCorrect ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}">
-                                <i class="fas ${isCorrect ? 'fa-check' : 'fa-times'}"></i>
-                            </div>
-                            <p class="font-bold text-slate-800 pt-1">Q${idx + 1}. ${q.question_texte}</p>
+            // --- VUE COURS ---
+            let filtered = allCourses.filter(c => {
+                const matchesSearch = c.titre.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesMatiere = c.matiere === currentMatiere;
+                let matchesCategory = true;
+                
+                if (currentUser) {
+                    if (c.classe !== currentUser.classe) matchesCategory = false;
+                    else if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
+                } else {
+                    if (currentFilter === 'free') matchesCategory = c.type_acces === 'free';
+                    else if (currentFilter !== 'all') matchesCategory = c.classe === currentFilter;
+                }
+                return matchesSearch && matchesMatiere && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                showStatus('noResults');
+                return;
+            }
+
+            filtered.forEach((course, index) => {
+                const isPremium = course.type_acces === 'premium';
+                const card = document.createElement('div');
+                card.className = `course-card bg-white rounded-[2rem] p-6 border border-slate-100 flex flex-col h-full relative group animate-slide-up`;
+                card.style.animationDelay = `${index * 50}ms`;
+                
+                const objectifsHtml = (course.cours_objectifs || []).slice(0, 3).map(o => `
+                    <div class="flex items-start gap-2.5 text-xs font-medium text-slate-500">
+                        <i class="fas fa-check text-brand-400 mt-0.5 text-[10px]"></i>
+                        <span class="leading-relaxed">${o.description}</span>
+                    </div>
+                `).join('');
+
+                let iconClass = 'fa-book';
+                let iconColor = 'bg-brand-50 text-brand-600';
+                if(currentMatiere === 'SVT') { iconClass = 'fa-leaf'; iconColor = 'bg-emerald-50 text-emerald-600'; }
+                if(currentMatiere === 'MATHS') { iconClass = 'fa-calculator'; iconColor = 'bg-red-50 text-red-600'; }
+                if(currentMatiere === 'PC') { iconClass = 'fa-atom'; iconColor = 'bg-purple-50 text-purple-600'; }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 ${iconColor} rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors duration-300">
+                            <i class="fas ${course.icone || iconClass}"></i>
                         </div>
-                        <div class="space-y-2 pl-11 mb-4">
-                            ${optionsDisplay}
+                        <span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide border ${isPremium ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}">
+                            ${isPremium ? '<i class="fas fa-crown mr-1"></i> Premium' : 'Gratuit'}
+                        </span>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">${course.classe}</span>
                         </div>
-                        <div class="ml-11 p-4 bg-blue-50 text-blue-800 text-xs md:text-sm rounded-xl border border-blue-100">
-                            <p class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i> Explication :</p>
-                            ${q.explication || "Pas d'explication disponible."}
-                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 leading-tight mb-4 group-hover:text-brand-600 transition-colors line-clamp-2">${course.titre}</h3>
+                        <div class="space-y-3 mb-6">${objectifsHtml || '<p class="text-xs text-slate-400 italic">Aucun objectif listé</p>'}</div>
+                    </div>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 pt-6 border-t border-slate-50 mt-auto">
+                         <button onclick="handleAccess('${course.url_vid}', ${isPremium}, '${course.matiere}')" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-slate-900 text-white font-bold text-[10px] hover:bg-slate-800 transition-all active:scale-95 shadow-sm"><i class="fas fa-play text-sm"></i> Vidéo</button>
+                         <button onclick="handleAccess('${course.url_exos}', ${isPremium}, '${course.matiere}')" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-amber-500 text-white font-bold text-[10px] hover:bg-amber-600 transition-all active:scale-95 shadow-sm"><i class="fas fa-tasks text-sm"></i> Exos Corrigés</button>
+                        <button onclick="handleQuizAccess('${course.id}', '${course.titre}', ${isPremium}, '${course.matiere}')" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-quiz-600 text-white font-bold text-[10px] hover:bg-quiz-700 transition-all active:scale-95 shadow-sm"><i class="fas fa-brain text-sm"></i> Quiz</button>
+                        <button onclick="handleAccess('${course.url_pdf}', ${isPremium}, '${course.matiere}')" class="flex flex-col items-center justify-center gap-1 py-3 rounded-xl bg-slate-50 text-slate-600 font-bold text-[10px] hover:bg-slate-100 border border-slate-200 transition-all active:scale-95"><i class="fas fa-file-pdf text-sm"></i> PDF</button>
                     </div>
                 `;
+                grid.appendChild(card);
             });
-            resultHtml += '</div>';
+        }
 
-            // Show Results
-            document.getElementById('quizContent').innerHTML = resultHtml;
-            document.getElementById('quizScoreBox').classList.remove('hidden', 'opacity-0');
-            document.getElementById('scoreValue').innerText = `${score}/${total}`;
+        function switchMatiere(matiere) {
+            currentMatiere = matiere;
             
-            // Buttons logic
-            document.getElementById('btnPrev').classList.add('hidden');
-            document.getElementById('btnNext').classList.add('hidden');
-            document.getElementById('btnSubmit').classList.add('hidden');
-            document.getElementById('btnRetry').classList.remove('hidden');
-
-            // Scroll top
-            document.getElementById('quizContent').scrollTop = 0;
-
-            if (score === total) showToast("Félicitations ! Un sans faute ! 🎉", "success");
-            else if (score >= total / 2) showToast("Bien joué ! Continue tes efforts.", "success");
-            else showToast("Révise encore un peu ce chapitre.", "warning");
-        }
-
-        function resetCurrentQuiz() {
-            if(currentQuizData) {
-                currentQuestionIndex = 0;
-                quizUserAnswers = {};
-                document.getElementById('quizScoreBox').classList.add('hidden', 'opacity-0');
-                document.getElementById('btnRetry').classList.add('hidden');
-                renderSingleQuestion(0);
-            }
-        }
-
-        function closeQuizModal() {
-            document.getElementById('quizModal').classList.add('hidden');
-            currentQuizData = null;
-        }
-
-        // --- AUTH & FILTERS (UNCHANGED) ---
-        function handleFilterClick(clickedBtn) {
-            const btn = clickedBtn.closest('.filter-btn');
-            if(!btn) return;
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.className = 'filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-slate-200 hover:border-brand-300 bg-white text-slate-600 shadow-sm';
+            // Update Tab UI
+            document.querySelectorAll('.subject-tab').forEach(btn => {
+                btn.classList.remove('active-svt', 'active-maths', 'active-pc');
             });
-            btn.className = 'filter-btn active py-3 rounded-xl font-bold transition-all text-xs bg-brand-600 text-white shadow-lg shadow-brand-200 border border-transparent transform scale-105';
-            if (btn.dataset.filter === 'free') btn.classList.add('bg-emerald-600', 'shadow-emerald-200');
-            currentFilter = btn.dataset.filter;
+            
+            if(matiere === 'SVT') document.getElementById('btnMatSVT').classList.add('active-svt');
+            if(matiere === 'MATHS') document.getElementById('btnMatMaths').classList.add('active-maths');
+            if(matiere === 'PC') document.getElementById('btnMatPC').classList.add('active-pc');
+            
             render();
         }
-        function resetFilters() { searchQuery = ''; document.getElementById('searchInput').value = ''; document.querySelector('[data-filter="all"]').click(); }
-function updateUIForUser() {
-    const authBtns = document.getElementById('navAuthButtons');
-    const userDisplay = document.getElementById('navUserDisplay');
-    const banner = document.getElementById('welcomeBanner');
-    const heroCTA = document.getElementById('heroCTA');
 
-    if (currentUser) {
-        authBtns.classList.add('hidden');
-        userDisplay.classList.remove('hidden');
-        banner.classList.remove('hidden');
-        
-        if (heroCTA) heroCTA.classList.add('hidden');
-        
-        // Infos de base
-        const initials = currentUser.nom.charAt(0).toUpperCase();
-        document.getElementById('userNameNav').innerText = currentUser.nom.split(' ')[0];
-        document.getElementById('userClassNav').innerText = currentUser.classe;
-        document.getElementById('userInitialNav').innerText = initials;
-        document.getElementById('welcomeUserText').innerText = `${currentUser.nom}`;
-        document.getElementById('userInitial').innerText = initials;
-        
-        // Compteur de bienvenue
-        const el = document.getElementById('monCompteur');
-        const jours = Math.ceil((new Date(currentUser.date_expiration) - new Date()) / 86400000);
+        function checkPremiumLock(isPremium, matiere) {
+            if (isPremium) {
+                
+                // 1. Existe dans la table eleves ?
+                if (!currentUser) { 
+                    showAuthModal('login'); 
+                    showToast("Connecte-toi pour voir ce contenu.", "warning"); 
+                    return true; // Bloqué
+                }
+                
+                // 2. actif = true ?
+                if (currentUser.actif !== true) {
+                    intendedPremiumMatiere = matiere;
+                    showPremiumOptionsModal(); 
+                    return true; // Bloqué
+                }
 
-        if (jours > 0) {
-            el.innerText = jours + " jours restants";
-            el.className = "hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700";
-        } else {
-            el.innerText = "Votre abonnement a expiré. Veuillez contacter l’administrateur pour vous réabonner.";
-            el.className = "flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 animate-pulse";
+                // 3. date_expiration encore valide ?
+                let isDateValid = false;
+                if (currentUser.date_expiration) {
+                    const daysRemaining = Math.ceil((new Date(currentUser.date_expiration) - new Date()) / 86400000);
+                    if (daysRemaining > 0) {
+                        isDateValid = true;
+                    }
+                }
+
+                if (!isDateValid) {
+                    intendedPremiumMatiere = matiere;
+                    showPremiumOptionsModal();
+                    showToast("Ton abonnement a expiré ou n'est pas actif.", "warning");
+                    return true; // Bloqué
+                }
+                
+                // 4. La matière est-elle dans abonnements ?
+                const userAboArray = currentUser.abonnements || [];
+                if (!userAboArray.includes(matiere)) { 
+                    intendedPremiumMatiere = matiere;
+                    showPremiumOptionsModal(); 
+                    return true; // Bloqué
+                }
+                
+                // 5. ACCÈS AUTORISÉ (Toutes les conditions sont remplies)
+            }
+            return false; // Si ce n'est pas premium, l'accès est libre
         }
-        el.classList.remove('hidden');
 
-        document.getElementById('motivationQuote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        function handleAccess(url, isPremium, matiere) {
+            if (!url || url === 'null' || url === 'undefined') { showToast("Ce contenu sera bientôt disponible.", "info"); return; }
+            if (checkPremiumLock(isPremium, matiere)) return;
+            window.open(url, '_blank');
+        }
 
-        // --- GESTION DU COMPTEUR D'ABONNEMENT DANS LA BARRE DE NAVIGATION ---
-        const subStatusBox = document.getElementById('subscriptionStatus');
-        
-        if (subStatusBox && currentUser.date_expiration) {
-            subStatusBox.classList.remove('hidden');
-            
-            const expirationDate = new Date(currentUser.date_expiration);
-            const today = new Date();
-            const timeDiff = expirationDate.getTime() - today.getTime();
-            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-            if (daysDiff > 0) {
-                // CAS : ABONNEMENT ACTIF
-                subStatusBox.className = "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm";
-                subStatusBox.innerHTML = `
-                    <i class="fas fa-clock text-emerald-500"></i>
-                    <span>${daysDiff} jour${daysDiff > 1 ? 's' : ''} restant(s)</span>
-                `;
-                subStatusBox.onclick = null;
-                subStatusBox.style.cursor = "default";
+        function showPremiumOptionsModal() { 
+            const msgEl = document.getElementById('premiumTargetMatiereMsg');
+            if(intendedPremiumMatiere) {
+                let subjectName = intendedPremiumMatiere;
+                if(subjectName==='PC') subjectName = 'Physique-Chimie';
+                msgEl.innerText = `Accès restreint : Le cours de ${subjectName} requiert un abonnement.`;
+                msgEl.classList.remove('hidden');
             } else {
-                // CAS : ABONNEMENT EXPIRÉ
-                subStatusBox.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] md:text-[11px] font-bold bg-red-50 text-red-700 border border-red-200 animate-pulse cursor-pointer transition-transform hover:scale-105";
-                subStatusBox.innerHTML = `
-                    <i class="fas fa-exclamation-triangle text-red-500"></i>
-                    <span class="hidden lg:inline">Votre abonnement a expiré. Cliquez ici pour le renouveler.</span>
-                    <span class="lg:hidden text-[9px]">Abonnement expiré</span>
-                `;
-                subStatusBox.onclick = () => contactAdmin();
+                msgEl.classList.add('hidden');
+            }
+            document.getElementById('premiumOptionsModal').classList.remove('hidden'); 
+        }
+        
+        function closePremiumOptionsModal() { 
+            document.getElementById('premiumOptionsModal').classList.add('hidden'); 
+            intendedPremiumMatiere = null;
+        }
+
+        // --- NOUVELLE GESTION DE LA SOUSCRIPTION ---
+        function orderSubscription(packType) {
+            // Si pack Excellence, pas besoin de choisir, on a les 3 d'office.
+            if (packType === 'EXCELLENCE') {
+                sendWhatsAppSubscription('EXCELLENCE', ['SVT', 'Mathématiques', 'Physique-Chimie']);
+                return;
+            }
+            
+            // Sinon (Solo ou Duo), on configure le modal de sélection
+            currentPackToSubscribe = packType;
+            maxSubjectsAllowed = packType === 'SOLO' ? 1 : 2;
+            selectedSubjectsForSub = []; // Reset de la sélection
+            
+            // Pré-sélectionner la matière en cours si l'élève a cliqué sur un cours verrouillé
+            if (intendedPremiumMatiere && selectedSubjectsForSub.length < maxSubjectsAllowed) {
+                selectedSubjectsForSub.push(intendedPremiumMatiere);
+            }
+            
+            document.getElementById('subjectSelectionSubtitle').innerText = `Tu as choisi le Pack ${packType === 'SOLO' ? 'Solo (1 matière)' : 'Duo (2 matières)'}.`;
+            updateSubjectSelectionUI();
+            
+            // On cache les tarifs et on affiche le choix des matières
+            document.getElementById('premiumOptionsModal').classList.add('hidden');
+            document.getElementById('subjectSelectionModal').classList.remove('hidden');
+        }
+
+        function toggleSubjectSelection(matiere) {
+            const index = selectedSubjectsForSub.indexOf(matiere);
+            if (index > -1) {
+                // Décocher
+                selectedSubjectsForSub.splice(index, 1);
+            } else {
+                // Cocher
+                if (selectedSubjectsForSub.length < maxSubjectsAllowed) {
+                    selectedSubjectsForSub.push(matiere);
+                } else {
+                    showToast(`Tu as déjà sélectionné tes ${maxSubjectsAllowed} matière(s).`, "warning");
+                    return;
+                }
+            }
+            updateSubjectSelectionUI();
+        }
+
+        function updateSubjectSelectionUI() {
+            const subjects = [
+                { id: 'SVT', el: 'btnSelectSVT' },
+                { id: 'MATHS', el: 'btnSelectMATHS' },
+                { id: 'PC', el: 'btnSelectPC' }
+            ];
+
+            subjects.forEach(sub => {
+                const btn = document.getElementById(sub.el);
+                const indicator = btn.querySelector('.check-indicator');
+                
+                if (selectedSubjectsForSub.includes(sub.id)) {
+                    btn.classList.remove('border-slate-200', 'bg-white');
+                    btn.classList.add('border-brand-500', 'bg-brand-50');
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-brand-600', 'bg-brand-600');
+                    indicator.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                } else {
+                    btn.classList.add('border-slate-200', 'bg-white');
+                    btn.classList.remove('border-brand-500', 'bg-brand-50');
+                    indicator.classList.add('border-slate-300');
+                    indicator.classList.remove('border-brand-600', 'bg-brand-600');
+                    indicator.innerHTML = '';
+                }
+            });
+
+            // Gérer le bouton de validation
+            const confirmBtn = document.getElementById('btnConfirmSubjects');
+            if (selectedSubjectsForSub.length === maxSubjectsAllowed) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                confirmBtn.classList.add('hover:-translate-y-0.5', 'hover:bg-brand-700', 'shadow-brand-200');
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                confirmBtn.classList.remove('hover:-translate-y-0.5', 'hover:bg-brand-700', 'shadow-brand-200');
             }
         }
-    } else {
-        authBtns.classList.remove('hidden');
-        userDisplay.classList.add('hidden');
-        banner.classList.add('hidden');
-        if (heroCTA) heroCTA.classList.remove('hidden');
-        
-        const subStatusBox = document.getElementById('subscriptionStatus');
-        if (subStatusBox) subStatusBox.classList.add('hidden');
-    }
-}
+
+        function closeSubjectSelectionModal() {
+            document.getElementById('subjectSelectionModal').classList.add('hidden');
+            document.getElementById('premiumOptionsModal').classList.remove('hidden'); // Retour aux tarifs
+        }
+
+        function confirmSubscription() {
+            if (selectedSubjectsForSub.length !== maxSubjectsAllowed) return;
+            
+            // Convertir les IDs en noms lisibles pour le message WhatsApp
+            const displayNames = selectedSubjectsForSub.map(s => {
+                if (s === 'MATHS') return 'Mathématiques';
+                if (s === 'PC') return 'Physique-Chimie';
+                return 'SVT';
+            });
+            
+            sendWhatsAppSubscription(currentPackToSubscribe, displayNames);
+            closeSubjectSelectionModal();
+            intendedPremiumMatiere = null; // Clean up
+        }
+
+        function sendWhatsAppSubscription(packType, subjectsArray) {
+            let nomClient = currentUser ? `*${currentUser.nom}* (Classe: ${currentUser.classe}, ID: ${currentUser.id})` : "un nouvel élève";
+            let packName = packType === 'EXCELLENCE' ? 'PACK EXCELLENCE (3 Matières)' : packType === 'DUO' ? 'PACK DUO (2 Matières)' : 'PACK SOLO (1 Matière)';
+            
+            let message = `Bonjour, c'est ${nomClient}.\n\n`;
+            message += `Je souhaite m'abonner au *${packName}* 🚀\n`;
+            message += `Matière(s) choisie(s) : *${subjectsArray.join(' et ')}*\n\n`;
+            message += `Quels sont les moyens de paiement ?`;
+
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function updateUIForUser() {
+            const authBtns = document.getElementById('navAuthButtons');
+            const userDisplay = document.getElementById('navUserDisplay');
+            const banner = document.getElementById('welcomeBanner');
+
+            if (currentUser) {
+                authBtns.classList.add('hidden');
+                userDisplay.classList.remove('hidden');
+                banner.classList.remove('hidden');
+                
+                const initials = currentUser.nom.charAt(0).toUpperCase();
+                document.getElementById('userNameNav').innerText = currentUser.nom.split(' ')[0];
+                document.getElementById('userClassNav').innerText = currentUser.classe;
+                document.getElementById('userInitialNav').innerText = initials;
+                document.getElementById('welcomeUserText').innerText = `${currentUser.nom}`;
+                document.getElementById('userInitial').innerText = initials;
+                document.getElementById('motivationQuote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+                const subStatusBox = document.getElementById('subscriptionStatus');
+                
+                if (subStatusBox && currentUser.date_expiration) {
+                    subStatusBox.classList.remove('hidden');
+                    const daysDiff = Math.ceil((new Date(currentUser.date_expiration) - new Date()) / 86400000);
+
+                    if (daysDiff > 0) {
+                        subStatusBox.className = "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm";
+                        subStatusBox.innerHTML = `<i class="fas fa-clock text-emerald-500"></i><span>${daysDiff} j restant(s)</span>`;
+                    } else {
+                        subStatusBox.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] md:text-[11px] font-bold bg-red-50 text-red-700 border border-red-200 animate-pulse cursor-pointer";
+                        subStatusBox.innerHTML = `<i class="fas fa-exclamation-triangle text-red-500"></i><span class="hidden lg:inline">Abonnement expiré.</span><span class="lg:hidden text-[9px]">Expiré</span>`;
+                        subStatusBox.onclick = () => showPremiumOptionsModal();
+                    }
+                }
+            } else {
+                authBtns.classList.remove('hidden');
+                userDisplay.classList.add('hidden');
+                banner.classList.add('hidden');
+                const subStatusBox = document.getElementById('subscriptionStatus');
+                if (subStatusBox) subStatusBox.classList.add('hidden');
+            }
+        }
+
         function showAuthModal(mode) {
             currentAuthMode = mode; document.getElementById('authModal').classList.remove('hidden');
             const s=document.getElementById('signupFields'), l=document.getElementById('loginFields'), t=document.getElementById('authTitle'), b=document.getElementById('authBtnLabel'), ft=document.getElementById('authFooterText'), fb=document.getElementById('authFooterBtn');
@@ -1005,137 +968,158 @@ function updateUIForUser() {
         }
         function toggleAuthMode() { showAuthModal(currentAuthMode === 'login' ? 'signup' : 'login'); }
         function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-async function handleAuth(e) {
-    e.preventDefault(); 
-    const btn = document.getElementById('authSubmitBtn'); 
-    const orig = btn.innerHTML;
-    btn.disabled = true; 
-    btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Traitement...';
 
-    try {
-        if (currentAuthMode === 'signup') {
-            const nom = document.getElementById('regFullName').value.trim();
-            const classe = document.getElementById('regClasse').value;
+        async function handleAuth(e) {
+            e.preventDefault(); 
+            const btn = document.getElementById('authSubmitBtn'); 
+            const orig = btn.innerHTML;
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Traitement...';
 
-            if (!nom || !classe) throw new Error("Champs manquants.");
+            try {
+                if (currentAuthMode === 'signup') {
+                    const nom = document.getElementById('regFullName').value.trim();
+                    const classe = document.getElementById('regClasse').value;
+                    if (!nom || !classe) throw new Error("Champs manquants.");
 
-            const nameParts = nom.split(' ').filter(p => p.length > 0);
-            if (nameParts.length < 2) {
-                throw new Error("Veuillez entrer votre prénom ET votre nom complet.");
-            }
-
-            const { data: existingUser, error: checkError } = await sbClient
-                .from('eleves')
-                .select('id')
-                .ilike('nom', nom) 
-                .maybeSingle();
-
-            if (checkError) throw checkError;
-            if (existingUser) {
-                throw new Error("Ce nom est déjà inscrit. Si c'est vous, contactez l'admin ou ajoutez un 2ème prénom.");
-            }
-
-            const id = generateEleveID();
-            const { error } = await sbClient.from('eleves').insert([{ id, nom, classe, actif: false }]);
-            
-            if (error) throw error;
-
-            showToast(`Compte créé ! ID: ${id}`, "success");
-            
-            const whatsappMsg = `Salut SVT Excellence ! 👋\n\n` +
-                                `Je viens de créer mon compte.\n` +
-                                `👤 Nom complet : *${nom}* \n` +
-                                `🏫 Classe : *${classe}*\n` +
-                                `🔑 Mon ID unique : *${id}*\n\n` +
-                                `Je voudrais valider mon inscription.`;
-
-            setTimeout(() => { 
-                window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(whatsappMsg)}`, '_blank'); 
-                closeAuthModal(); 
-            }, 1500);
-
-        } else {
-            // --- MODE CONNEXION ---
-            const id = document.getElementById('loginID').value.toUpperCase().trim();
-            if (id.length < 4) throw new Error("ID invalide.");
-            
-            const { data, error } = await sbClient.from('eleves').select('*').eq('id', id).single();
-            if (error || !data) throw new Error("ID introuvable.");
-
-            const currentDeviceId = getDeviceID();
-
-            if (data.device_id) {
-                if (data.device_id !== currentDeviceId) {
-                    throw new Error("Ce code est déjà utilisé sur un autre téléphone. Contactez l'admin si vous avez changé d'appareil.");
-                }
-            } else {
-                const { error: updateError } = await sbClient
-                    .from('eleves')
-                    .update({ device_id: currentDeviceId })
-                    .eq('id', id);
+                    const id = "E" + Math.random().toString(36).substring(2, 5).toUpperCase();
                     
-                if (updateError) throw new Error("Erreur lors de la liaison de l'appareil.");
-                data.device_id = currentDeviceId; 
-            }
+                    // On signup, polyfill new structure
+                    const { error } = await sbClient.from('eleves').insert([{ id, nom, classe, actif: false, abonnements: [] }]);
+                    if (error) throw error;
 
-            currentUser = data; 
-            // MODIFICATION : Utilisation de sessionStorage au lieu de localStorage
-            sessionStorage.setItem('svt_user_session', JSON.stringify(data));
+                    showToast(`Compte créé ! ID: ${id}`, "success");
+                    
+                    const msg = `Salut Excellence Académie ! 👋\nJe viens de créer mon compte.\n👤 Nom : *${nom}* \n🏫 Classe : *${classe}*\n🔑 ID : *${id}*\n\nJe voudrais m'abonner.`;
+                    setTimeout(() => { window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank'); closeAuthModal(); }, 1500);
+                } else {
+                    const id = document.getElementById('loginID').value.toUpperCase().trim();
+                    if (id.length < 4) throw new Error("ID invalide.");
+                    
+                    const { data, error } = await sbClient.from('eleves').select('*').eq('id', id).single();
+                    if (error || !data) throw new Error("ID introuvable.");
+
+                    const currentDeviceId = getDeviceID();
+                    if (data.device_id && data.device_id !== currentDeviceId) {
+                        throw new Error("Code utilisé sur un autre téléphone.");
+                    } else if (!data.device_id) {
+                        await sbClient.from('eleves').update({ device_id: currentDeviceId }).eq('id', id);
+                    }
+
+                    // Polyfill si BDD pas à jour
+                    if(!data.abonnements) data.abonnements = data.actif ? ['SVT'] : [];
+
+                    currentUser = data; 
+                    sessionStorage.setItem('svt_user_session', JSON.stringify(data));
+                    showToast(`Bienvenue ${data.nom.split(' ')[0]}`, "success"); 
+                    updateUIForUser(); 
+                    closeAuthModal(); 
+                    render();
+                }
+            } catch (err) { showToast(err.message, "error"); } 
+            finally { btn.disabled = false; btn.innerHTML = orig; }
+        }
+
+        function logout() { sessionStorage.removeItem('svt_user_session'); currentUser = null; updateUIForUser(); showToast("Déconnecté", "info"); render(); }
+        function getDeviceID() {
+            let deviceId = localStorage.getItem('svt_device_id');
+            if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); localStorage.setItem('svt_device_id', deviceId); }
+            return deviceId;
+        }
+
+        // QUIZ LOGIC 
+        async function handleQuizAccess(courseId, courseTitle, isPremium, matiere) {
+            if (checkPremiumLock(isPremium, matiere)) return;
+            currentQuestionIndex = 0; quizUserAnswers = {}; currentQuizData = null;
+            document.getElementById('quizTitle').innerText = "Quiz : " + courseTitle;
+            document.getElementById('quizModal').classList.remove('hidden');
+            document.getElementById('quizContent').innerHTML = `<div class="text-center py-10"><i class="fas fa-circle-notch animate-spin text-3xl text-brand-200"></i><p class="mt-4 text-slate-400 font-bold">Chargement des questions...</p></div>`;
+            document.getElementById('quizScoreBox').classList.add('hidden');
+            ['btnPrev','btnNext','btnSubmit','btnRetry'].forEach(id => document.getElementById(id).classList.add('hidden'));
+
+            try {
+                const { data, error } = await sbClient.from('quiz_questions').select(`id, question_texte, explication, quiz_options ( id, option_texte, est_correcte )`).eq('cours_id', courseId);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    document.getElementById('quizContent').innerHTML = `<div class="text-center py-10"><h3 class="text-lg font-bold text-slate-700">Quiz en construction</h3><button onclick="closeQuizModal()" class="mt-6 px-6 py-2 bg-slate-200 rounded-lg">Fermer</button></div>`;
+                    return;
+                }
+                currentQuizData = data; renderSingleQuestion(0);
+            } catch (err) { showToast("Erreur chargement quiz.", "error"); closeQuizModal(); }
+        }
+
+        function renderSingleQuestion(index) {
+            if(!currentQuizData || !currentQuizData[index]) return;
+            const q = currentQuizData[index], total = currentQuizData.length;
+            document.getElementById('quizProgressBar').style.width = `${((index + 1) / total) * 100}%`;
+            document.getElementById('questionProgressText').innerText = `Question ${index + 1}/${total}`;
             
-            showToast(`Bienvenue ${data.nom.split(' ')[0]}`, "success"); 
-            updateUIForUser(); 
-            closeAuthModal(); 
+            let optionsHtml = '';
+            q.quiz_options.forEach(opt => {
+                const isChecked = quizUserAnswers[q.id] === opt.id ? 'checked' : '';
+                optionsHtml += `<label class="option-label block relative group cursor-pointer" onclick="quizUserAnswers[${q.id}] = ${opt.id}">
+                    <input type="radio" name="q_current" value="${opt.id}" class="option-radio absolute opacity-0 w-0 h-0 peer" ${isChecked}>
+                    <div class="option-content p-4 rounded-xl bg-white border-2 border-slate-200 text-slate-600 font-medium peer-hover:border-brand-200 transition-all flex items-center gap-3">
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center peer-checked:border-quiz-500 peer-checked:bg-quiz-500"><div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div></div>
+                        <span>${opt.option_texte}</span>
+                    </div></label>`;
+            });
+
+            document.getElementById('quizContent').innerHTML = `<div class="fade-in"><p class="font-bold text-slate-800 mb-6 text-lg md:text-xl"><span class="text-quiz-500 mr-2 text-2xl font-black">Q${index + 1}.</span> ${q.question_texte}</p><div class="space-y-4">${optionsHtml}</div></div>`;
+            document.getElementById('btnPrev').classList.toggle('hidden', index === 0);
+            document.getElementById('btnNext').classList.toggle('hidden', index === total - 1);
+            document.getElementById('btnSubmit').classList.toggle('hidden', index !== total - 1);
+        }
+
+        function changeQuestion(dir) { const ni = currentQuestionIndex + dir; if (ni >= 0 && ni < currentQuizData.length) { currentQuestionIndex = ni; renderSingleQuestion(ni); } }
+
+        function evaluateQuiz() {
+            let score = 0, total = currentQuizData.length, resultHtml = '<div class="space-y-8 fade-in pb-10">';
+            currentQuizData.forEach((q, idx) => {
+                const userChoiceId = quizUserAnswers[q.id];
+                const correctOpt = q.quiz_options.find(o => o.est_correcte);
+                let isCorrect = correctOpt && userChoiceId === correctOpt.id;
+                if(isCorrect) score++;
+
+                let optionsDisplay = '';
+                q.quiz_options.forEach(opt => {
+                    let classes = "p-3 rounded-lg border border-slate-100 text-sm flex items-center gap-2";
+                    let icon = '';
+                    if (opt.id === userChoiceId && opt.est_correcte) { classes = "p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 font-bold"; icon = '<i class="fas fa-check text-emerald-600 ml-auto"></i>'; }
+                    else if (opt.id === userChoiceId && !opt.est_correcte) { classes = "p-3 rounded-lg border border-red-200 bg-red-50 text-red-800 font-bold"; icon = '<i class="fas fa-times text-red-500 ml-auto"></i>'; }
+                    else if (opt.est_correcte) { classes = "p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 font-bold opacity-80"; icon = '<span class="text-[10px] bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded ml-auto">Réponse correcte</span>'; }
+                    optionsDisplay += `<div class="${classes}">${opt.option_texte} ${icon}</div>`;
+                });
+
+                resultHtml += `<div class="bg-slate-50 p-6 rounded-2xl border ${isCorrect ? 'border-emerald-100' : 'border-red-100'}"><div class="flex items-start gap-3 mb-4"><div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isCorrect ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}"><i class="fas ${isCorrect ? 'fa-check' : 'fa-times'}"></i></div><p class="font-bold text-slate-800 pt-1">Q${idx + 1}. ${q.question_texte}</p></div><div class="space-y-2 pl-11 mb-4">${optionsDisplay}</div><div class="ml-11 p-4 bg-blue-50 text-blue-800 text-xs md:text-sm rounded-xl border border-blue-100"><p class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i> Explication :</p>${q.explication || "Pas d'explication disponible."}</div></div>`;
+            });
+            
+            document.getElementById('quizContent').innerHTML = resultHtml + '</div>';
+            document.getElementById('quizScoreBox').classList.remove('hidden', 'opacity-0');
+            document.getElementById('scoreValue').innerText = `${score}/${total}`;
+            ['btnPrev','btnNext','btnSubmit'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('btnRetry').classList.remove('hidden');
+            document.getElementById('quizContent').scrollTop = 0;
+            showToast(score === total ? "Un sans faute ! 🎉" : score >= total / 2 ? "Bien joué !" : "Révise encore ce chapitre.", score >= total/2 ? "success" : "warning");
+        }
+
+        function resetCurrentQuiz() { if(currentQuizData) { currentQuestionIndex = 0; quizUserAnswers = {}; document.getElementById('quizScoreBox').classList.add('hidden', 'opacity-0'); document.getElementById('btnRetry').classList.add('hidden'); renderSingleQuestion(0); } }
+        function closeQuizModal() { document.getElementById('quizModal').classList.add('hidden'); currentQuizData = null; }
+
+        function handleFilterClick(clickedBtn) {
+            const btn = clickedBtn.closest('.filter-btn');
+            if(!btn) return;
+            document.querySelectorAll('.filter-btn').forEach(b => b.className = 'filter-btn py-3 rounded-xl font-bold transition-all text-xs border border-slate-200 hover:border-slate-300 bg-white text-slate-600 shadow-sm');
+            btn.className = 'filter-btn active py-3 rounded-xl font-bold transition-all text-xs bg-slate-900 text-white shadow-md border border-transparent';
+            if (btn.dataset.filter === 'free') btn.classList.add('bg-emerald-600', 'shadow-emerald-200');
+            currentFilter = btn.dataset.filter;
             render();
         }
-    } catch (err) { 
-        showToast(err.message, "error"); 
-    } finally { 
-        btn.disabled = false; 
-        btn.innerHTML = orig; 
-    }
-}
-        function generateEleveID() { const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c.charAt(Math.floor(Math.random()*c.length)); return r; }
         
-        function logout() { 
-            // MODIFICATION : Nettoyage du sessionStorage
-            sessionStorage.removeItem('svt_user_session'); 
-            currentUser = null; 
-            updateUIForUser(); 
-            showToast("Déconnecté", "info"); 
-            render(); 
-        }
-
-        function showPremiumModal(t, m) { document.getElementById('premiumModalTitle').innerText = t; document.getElementById('premiumModalMsg').innerText = m; document.getElementById('premiumModal').classList.remove('hidden'); }
-        function closePremiumModal() { document.getElementById('premiumModal').classList.add('hidden'); }
-        function contactAdmin() {
-    let message = "";
-
-    if (currentUser) {
-        message = `Bonjour, c'est *${currentUser.nom}* (Classe: ${currentUser.classe}).\n` +
-                  `Mon Identifiant est : *${currentUser.id}*.\n\n` +
-                  `Je souhaite activer mon *Pack Premium* pour accéder à toutes les vidéos et exercices corrigés. 🚀\n` +
-                  `Quels sont les moyens de paiement ?`;
-    } else {
-        message = `Bonjour, je suis intéressé par les cours de SVT Excellence.\n` +
-                  `Pouvez-vous m'expliquer comment s'inscrire et comment ça marche ?`;
-    }
-
-    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
-}
-        
-function orderManual() {
-    const message = `Bonjour SVT Excellence ! 👋\n\n` +
-                    `Je suis intéressé par le manuel *Le Dompteur des Sciences de la Vie et de la Terre* 📘.\n\n` +
-                    `Je sais qu'il contient :\n` +
-                    `✅ Les épreuves du BAC corrigées\n` +
-                    `✅ Des fiches de synthèse (Neuro, Immuno, Génétique...)\n` +
-                    `✅ Des schémas et analyses de documents\n\n` +
-                    `Je souhaite le commander. Quel est le prix et comment se passe la livraison ?`;
-
-    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
-}
+        function resetFilters() { searchQuery = ''; document.getElementById('searchInput').value = ''; document.querySelector('[data-filter="all"]').click(); }
         function showStatus(id) { hideAllStatus(); document.getElementById('statusContainer').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); document.getElementById('coursesGrid').classList.add('hidden'); }
         function hideAllStatus() { document.getElementById('statusContainer').classList.add('hidden'); document.getElementById('loader').classList.add('hidden'); document.getElementById('noResults').classList.add('hidden'); document.getElementById('coursesGrid').classList.remove('hidden'); }
+        
         function showToast(m, t='info') {
             const c = document.getElementById('toastContainer'); let bg='bg-white', ic='fa-info-circle text-blue-500', bc='border-blue-500';
             if (t==='success') { ic='fa-check-circle text-emerald-500'; bc='border-emerald-500'; }
@@ -1147,45 +1131,34 @@ function orderManual() {
         }
 
         function switchView(view) {
-    currentView = view;
-    
-    const btnCours = document.getElementById('tabCours');
-    const btnAnnales = document.getElementById('tabAnnales');
-    
-    if (view === 'cours') {
-        btnCours.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 bg-slate-900 text-white shadow-md";
-        btnAnnales.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all duration-300 hover:text-amber-600 hover:bg-amber-50";
-        document.getElementById('filterContainer').parentNode.classList.remove('hidden');
-    } else {
-        btnCours.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all duration-300 hover:text-brand-600 hover:bg-slate-50";
-        btnAnnales.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 bg-amber-500 text-white shadow-lg shadow-amber-200";
-        document.getElementById('filterContainer').parentNode.classList.add('hidden');
-    }
+            currentView = view;
+            const btnCours = document.getElementById('tabCours');
+            const btnAnnales = document.getElementById('tabAnnales');
+            if (view === 'cours') {
+                btnCours.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 bg-slate-900 text-white shadow-md";
+                btnAnnales.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all duration-300 hover:text-amber-600 hover:bg-amber-50";
+                document.getElementById('filterContainer').parentNode.classList.remove('hidden');
+            } else {
+                btnCours.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 transition-all duration-300 hover:text-brand-600 hover:bg-slate-50";
+                btnAnnales.className = "relative z-10 px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 bg-amber-500 text-white shadow-lg shadow-amber-200";
+                document.getElementById('filterContainer').parentNode.classList.add('hidden');
+            }
+            render();
+        }
 
-    render();
-}
         function orderAnnale(titre, prix) {
-    const nomClient = currentUser ? currentUser.nom : "un élève";
-    const classeClient = currentUser ? currentUser.classe : "non spécifiée";
-    
-    const message = `🔥 *COMMANDE URGENTE* 🔥\n\n` +
-                    `Bonjour, je suis *${nomClient}* (Classe: ${classeClient}).\n` +
-                    `Je veux acheter l'annale suivante pour booster mes notes :\n\n` +
-                    `📚 Titre : *${titre}*\n` +
-                    `💰 Prix : *${prix} FCFA*\n\n` +
-                    `J'ai l'argent, comment je paye ? (Orange Money / Wave ?)`;
-
-    window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
-}
-// Code Local
-    function getDeviceID() {
-    let deviceId = localStorage.getItem('svt_device_id');
-    if (!deviceId) {
-        deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-        localStorage.setItem('svt_device_id', deviceId); // On laisse le device_id en localStorage pour le verrouillage par téléphone
-    }
-    return deviceId;
-}
+            const msg = `🔥 *COMMANDE URGENTE* 🔥\nBonjour, je suis intéressé par l'annale:\n📚 Titre : *${titre}*\n💰 Prix : *${prix} FCFA*\nComment payer ?`;
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+        
+        function orderManual() {
+            const msg = `Bonjour Excellence Académie ! 👋\nJe suis intéressé par le manuel.\nJe souhaite le commander. Quel est le prix et la livraison ?`;
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+        
+        function contactAdmin() {
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent("Bonjour, j'ai besoin d'aide concernant mon compte.")}`, '_blank');
+        }
     </script>
 </body>
 </html>
