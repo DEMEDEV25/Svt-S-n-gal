@@ -164,7 +164,7 @@
             <div class="lg:w-5/12 w-full">
                 <div class="bg-white/90 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-100 shadow-2xl shadow-brand-900/5 relative">
                     <h3 class="text-lg font-black text-slate-900 mb-5 flex items-center justify-between">
-                        <span>Trouve ta leçon</span>
+                        <span id="searchCardTitle">Trouve ta leçon</span>
                         <i class="fas fa-search text-brand-500 text-sm"></i>
                     </h3>
                     
@@ -799,11 +799,17 @@
             const authBtns = document.getElementById('navAuthButtons');
             const userDisplay = document.getElementById('navUserDisplay');
             const banner = document.getElementById('welcomeBanner');
+            const filterCategoryBox = document.getElementById('filterCategoryBox');
+            const searchCardTitle = document.getElementById('searchCardTitle');
 
             if (currentUser) {
                 authBtns.classList.add('hidden'); 
                 userDisplay.classList.remove('hidden'); 
                 banner.classList.remove('hidden');
+                
+                // Masquer la section "Filtrer par niveau" pour l'élève connecté (ses cours s'affichent automatiquement selon sa classe)
+                if (filterCategoryBox) filterCategoryBox.classList.add('hidden');
+                if (searchCardTitle) searchCardTitle.innerText = `Mes cours (${currentUser.classe})`;
                 
                 const initials = currentUser.nom ? currentUser.nom.charAt(0).toUpperCase() : 'U';
                 document.getElementById('userNameNav').innerText = currentUser.nom.split(' ')[0];
@@ -878,6 +884,10 @@
                 authBtns.classList.remove('hidden'); 
                 userDisplay.classList.add('hidden'); 
                 banner.classList.add('hidden');
+                
+                // Réafficher le filtre par niveau si l'utilisateur n'est pas connecté (visiteur)
+                if (filterCategoryBox) filterCategoryBox.classList.remove('hidden');
+                if (searchCardTitle) searchCardTitle.innerText = "Trouve ta leçon";
             }
         }
 
@@ -1307,7 +1317,8 @@
         function resetFilters() { 
             searchQuery = ''; 
             document.getElementById('searchInput').value = ''; 
-            document.querySelector('[data-filter="all"]').click(); 
+            const defaultBtn = document.querySelector('[data-filter="all"]');
+            if(defaultBtn) defaultBtn.click();
         }
 
         function resetFiltersAndReload() {
@@ -1358,7 +1369,8 @@
             if (view === 'cours') { 
                 btnCours.className = "relative z-10 px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 bg-slate-900 text-white shadow-md"; 
                 btnAnnales.className = "relative z-10 px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 transition-all duration-300 hover:text-amber-600 hover:bg-amber-50"; 
-                if (filterBox) filterBox.classList.remove('hidden');
+                // Ne réaffiche le filtre de niveau que si l'élève n'est pas connecté
+                if (filterBox && !currentUser) filterBox.classList.remove('hidden');
             } else { 
                 btnCours.className = "relative z-10 px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 transition-all duration-300 hover:text-brand-600 hover:bg-slate-50"; 
                 btnAnnales.className = "relative z-10 px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 bg-amber-500 text-white shadow-lg shadow-amber-200"; 
@@ -1378,7 +1390,7 @@
         }
 
         function contactAdmin() { 
-            window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent("Bonjour, j'ai besoin d'assistance pour mon compte Excellence Académie.")}`, '_blank'); 
+            window.open(`https://wa.me/${adminName}?text=${encodeURIComponent("Bonjour, j'ai besoin d'assistance pour mon compte Excellence Académie.")}`, '_blank'); 
         }
     </script>
 </body>
