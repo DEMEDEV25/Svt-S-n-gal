@@ -198,23 +198,8 @@
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full">
         <!-- LECTEUR VIDÉO PRINCIPAL DÉDIÉ (HORS DES CARTES) -->
-        <div id="mainVideoSection" class="hidden mb-8 bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl border border-slate-800 transition-all scroll-mt-24">
-            <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-                <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-brand-500 animate-pulse shrink-0"></span>
-                    <h3 id="mainVideoTitle" class="text-xs sm:text-sm font-extrabold text-white truncate">Vidéo explicative</h3>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openVideoExternal()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition flex items-center gap-1">
-                        <i class="fas fa-up-right-from-square text-xs"></i> <span class="hidden sm:inline">Onglet</span>
-                    </button>
-                    <button onclick="closeMainVideo()" class="px-3 py-1 bg-slate-800 hover:bg-red-900/50 text-slate-300 hover:text-red-300 rounded-lg text-xs font-bold transition flex items-center gap-1">
-                        <i class="fas fa-times"></i> <span>Fermer</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="relative w-full bg-black" style="aspect-ratio: 16/9;">
+        <div id="mainVideoSection" class="hidden mb-8 flex justify-center scroll-mt-24">
+            <div id="mainVideoFrame" class="relative w-full bg-black" style="aspect-ratio: 16/9;">
                 <div id="mainVideoBody" class="absolute inset-0 flex items-center justify-center text-slate-500">
                     <i class="fas fa-circle-notch fa-spin text-2xl text-brand-500"></i>
                 </div>
@@ -1033,10 +1018,8 @@
             currentVideoExternal = src.external;
 
             const section = document.getElementById('mainVideoSection');
-            const titleEl = document.getElementById('mainVideoTitle');
             const bodyEl = document.getElementById('mainVideoBody');
 
-            titleEl.innerText = titre;
             bodyEl.innerHTML = `
                 <iframe src="${src.embed.replace(/"/g, '&quot;')}" 
                         class="absolute top-0 left-0 w-full h-full border-0" 
@@ -1046,8 +1029,27 @@
                 </iframe>`;
 
             section.classList.remove('hidden');
+            fitMainVideo();
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+
+        // Ajuste le cadre 16/9 à la hauteur réellement disponible :
+        // hauteur visible - barre de nav sticky - bandeau titre/boutons de la vidéo
+        function fitMainVideo() {
+            const section = document.getElementById('mainVideoSection');
+            if (!section || section.classList.contains('hidden')) return;
+            const frame = document.getElementById('mainVideoFrame');
+            const nav = document.getElementById('navbar');
+            const navH = nav ? nav.offsetHeight : 0;
+            const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const availH = vh - navH - 16; // hauteur visible - navbar sticky - marge
+            const maxW = Math.max(availH * 16 / 9, 240);
+            frame.style.width = Math.min(maxW, section.clientWidth) + 'px';
+            section.style.scrollMarginTop = (navH + 8) + 'px';
+        }
+        window.addEventListener('resize', fitMainVideo);
+        window.addEventListener('orientationchange', () => setTimeout(fitMainVideo, 200));
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', fitMainVideo);
 
         function closeMainVideo() {
             const section = document.getElementById('mainVideoSection');
