@@ -76,10 +76,8 @@
         .subject-tab.active-svt { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35); }
         .subject-tab.active-maths { background-color: #dc2626; color: white; border-color: #dc2626; box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.35); }
         .subject-tab.active-pc { background-color: #7c3aed; color: white; border-color: #7c3aed; box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.35); }
-    /* Largeur de la boîte vidéo = échelle (--vs) x largeur max qui tient dans l'écran (jamais plus haute que l'écran) */
-    .vbox{--vs:.5;width:max(260px,calc(var(--vs) * min(100vw - 1.5rem, 64rem, (100dvh - 7.5rem) * 16 / 9)));max-width:calc(100vw - 1.5rem)}
-    #videoModalBody:fullscreen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
-#videoModalBody:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
+    #videoModalBody:fullscreen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important;background:#000}
+    #videoModalBody:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important;background:#000}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col">
@@ -286,26 +284,25 @@
         </div>
     </footer>
 
-    <!-- MODAL LECTEUR VIDÉO 16:9 AVEC SYSTÈME D'ÉCHELLE (50 % par défaut, ajustable par le client) -->
-    <div id="videoModal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-3 sm:p-6 bg-slate-950/90 backdrop-blur-md transition-all duration-300" onclick="closeVideoModal(event)">
-        <div id="videoModalBox" class="vbox relative bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 animate-slide-up" onclick="event.stopPropagation()">
+    <!-- MODAL LECTEUR VIDÉO RESPONSIVE (échelle 50 % par défaut, ajustable) -->
+    <div id="videoModal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-2 sm:p-6 bg-slate-950/90 backdrop-blur-md overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle" onclick="closeVideoModal(event)">
+        <div id="videoModalBox" class="relative bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 flex-none" style="width:320px;max-width:100%" onclick="event.stopPropagation()">
             <!-- En-tête -->
-            <div class="flex justify-between items-center gap-2 px-3 py-2 bg-slate-900/90 border-b border-slate-800" style="min-height:48px">
-                <h3 id="videoModalTitle" class="text-xs sm:text-sm font-extrabold text-white truncate">Vidéo explicative</h3>
-                <button onclick="closeVideoModal()" class="w-8 h-8 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-full transition shrink-0" title="Fermer">
+            <div id="videoModalHeader" class="flex justify-between items-center gap-2 px-3 bg-slate-900 border-b border-slate-800" style="height:40px">
+                <h3 id="videoModalTitle" class="text-xs sm:text-sm font-extrabold text-white truncate min-w-0">Vidéo explicative</h3>
+                <button onclick="closeVideoModal()" class="w-8 h-8 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-full transition shrink-0" title="Fermer" aria-label="Fermer la vidéo">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
-            <!-- Lecteur vidéo 16:9 : prend toute la largeur de la boîte, la boîte suit l'échelle -->
-            <div id="videoModalBody" class="w-full bg-black relative overflow-hidden" style="aspect-ratio:16/9;">
-                <!-- Iframe injecté par JS -->
-            </div>
-            <!-- Barre de contrôle de l'échelle -->
-            <div class="flex items-center justify-center gap-2 px-3 py-2 bg-slate-900 border-t border-slate-800">
-                <button id="vsMinus" onclick="changeVideoScale(-1)" class="w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white rounded-full transition" title="Réduire la vidéo"><i class="fas fa-minus text-xs"></i></button>
-                <span id="vsLabel" class="min-w-[3rem] text-center text-xs font-black text-slate-300">50%</span>
-                <button id="vsPlus" onclick="changeVideoScale(1)" class="w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white rounded-full transition" title="Agrandir la vidéo"><i class="fas fa-plus text-xs"></i></button>
-                <button id="videoFsBtn" onclick="toggleVideoFullscreen()" class="w-9 h-9 ml-2 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded-full transition" title="Plein écran"><i class="fas fa-expand text-xs"></i></button>
+            <!-- Vidéo 16:9 -->
+            <div id="videoModalBody" class="w-full bg-black relative overflow-hidden" style="aspect-ratio:16/9;"></div>
+            <!-- Barre de contrôle -->
+            <div id="videoModalBar" class="flex items-center justify-center gap-1.5 px-2 bg-slate-900 border-t border-slate-800" style="height:48px">
+                <button id="vsMinus" onclick="changeVideoScale(-1)" class="w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white rounded-full transition" title="Réduire la vidéo" aria-label="Réduire la vidéo"><i class="fas fa-minus text-xs"></i></button>
+                <span id="vsLabel" class="min-w-[2.75rem] text-center text-xs font-black text-slate-300">50%</span>
+                <button id="vsPlus" onclick="changeVideoScale(1)" class="w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white rounded-full transition" title="Agrandir la vidéo" aria-label="Agrandir la vidéo"><i class="fas fa-plus text-xs"></i></button>
+                <button id="videoFsBtn" onclick="toggleVideoFullscreen()" class="w-9 h-9 ml-1 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded-full transition" title="Plein écran" aria-label="Plein écran"><i class="fas fa-expand text-xs"></i></button>
+                <button onclick="openVideoExternal()" class="w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded-full transition" title="Ouvrir dans un nouvel onglet" aria-label="Ouvrir dans un nouvel onglet"><i class="fas fa-up-right-from-square text-xs"></i></button>
             </div>
         </div>
     </div>
@@ -974,7 +971,7 @@
                     <div class="mb-4">
                         <button onclick="openVideoModal('${videoId}', '${sanitizeInput(course.titre)}', ${isPremium}, '${course.matiere}')" class="w-full px-4 py-3 bg-slate-900 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 hover:bg-brand-600 transition shadow-md active:scale-95">
                             <i class="fas fa-play-circle text-brand-400 text-sm"></i>
-                            <span>Regarder la vidéo (16:9)</span>
+                            <span>Regarder la vidéo</span>
                         </button>
                     </div>
 
@@ -997,100 +994,199 @@
             }
         }
 
-        // GESTION DU MODAL VIDÉO GRAND ÉCRAN (SOLUTION 1)
-        function openVideoModal(videoId, titre, isPremium, matiere) {
-            if (checkPremiumLock(isPremium, matiere)) return;
-
-            if (!videoId || videoId === 'null' || videoId === 'undefined' || videoId.trim() === '') {
-                showToast("ID de vidéo non renseigné pour ce cours.", "warning");
-                return;
-            }
-
-            const videoModal = document.getElementById('videoModal');
-            const videoModalTitle = document.getElementById('videoModalTitle');
-            const videoModalBody = document.getElementById('videoModalBody');
-
-            videoModalTitle.innerText = titre;
-            videoModalBody.innerHTML = `
-                <iframe id="videoFrame" style="position:absolute;top:0;left:0;width:1280px;height:720px;border:0;transform-origin:0 0;visibility:hidden" src="https://drive.google.com/file/d/${videoId.trim()}/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            `;
-
-            applyVideoScale();
-            videoModal.classList.remove('hidden');
-            requestAnimationFrame(fitVideoFrame);
-            document.body.style.overflow = 'hidden'; // Empêcher le défilement de l'arrière-plan
-        }
-
-        // SYSTÈME D'ÉCHELLE DE LA VIDÉO (50 % par défaut, le client peut agrandir/réduire)
-        const VIDEO_SCALES = [0.35, 0.5, 0.75, 1];
-        let videoScaleIdx = 1; // 50 %
+        // ============================================================
+        // LECTEUR VIDÉO RESPONSIVE (petit téléphone → grand écran)
+        // ============================================================
+        let videoScaleIdx = 1;        // 50 % par défaut
+        let videoEffIdx = 1;
+        let videoValid = [0, 1, 2, 3];
+        let videoPseudoFs = false;    // plein écran "simulé" (iPhone)
+        let currentVideoExternal = '';
         try {
-            const saved = parseFloat(localStorage.getItem('videoScale'));
-            const i = VIDEO_SCALES.indexOf(saved);
+            const i = VIDEO_SCALES.indexOf(parseFloat(localStorage.getItem('videoScale')));
             if (i !== -1) videoScaleIdx = i;
         } catch (e) {}
 
-        // Met la VIDÉO ELLE-MÊME à l'échelle : le lecteur (1280x720) est réduit/agrandi avec transform
-        const VIDEO_BASE_W = 1280, VIDEO_BASE_H = 720;
+        const VIDEO_SCALES = [0.35, 0.5, 0.75, 1];
+        const VIDEO_MIN_BOX = 240;   // largeur mini de la boîte (px) : garde les boutons lisibles
+        const VIDEO_MAX_W = 1280;    // largeur max de la vidéo sur grand écran
+
+        // Transforme ce qui est stocké en base (ID Drive, lien Drive, lien YouTube...) en lien intégrable
+        function buildVideoSource(raw) {
+            const v = String(raw || '').trim();
+            if (!v || v === 'null' || v === 'undefined') return null;
+            if (/^[A-Za-z0-9_-]{10,}$/.test(v)) {
+                return { embed: 'https://drive.google.com/file/d/' + v + '/preview', external: 'https://drive.google.com/file/d/' + v + '/view' };
+            }
+            if (!/^https:\/\//i.test(v)) return null;
+            let u;
+            try { u = new URL(v); } catch (e) { return null; }
+            const host = u.hostname.replace(/^www\./, '');
+            if (host === 'drive.google.com') {
+                const m = u.pathname.match(/\/file\/d\/([A-Za-z0-9_-]+)/);
+                const id = m ? m[1] : u.searchParams.get('id');
+                if (id && /^[A-Za-z0-9_-]+$/.test(id)) {
+                    return { embed: 'https://drive.google.com/file/d/' + id + '/preview', external: 'https://drive.google.com/file/d/' + id + '/view' };
+                }
+            }
+            if (host === 'youtu.be' || host.endsWith('youtube.com')) {
+                let id = host === 'youtu.be' ? u.pathname.slice(1) : (u.searchParams.get('v') || (u.pathname.match(/\/(?:embed|shorts)\/([^/]+)/) || [])[1]);
+                if (id && /^[A-Za-z0-9_-]+$/.test(id)) {
+                    return { embed: 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0&playsinline=1', external: 'https://www.youtube.com/watch?v=' + id };
+                }
+            }
+            return { embed: v, external: v };
+        }
+
+        // Calcul pur de la taille de la vidéo : availW/availH = place réellement disponible pour la vidéo (px)
+        function videoLayoutMetrics(availW, availH, scaleIdx, fullFit) {
+            const maxW = Math.max(VIDEO_MIN_BOX, Math.min(availW, VIDEO_MAX_W, availH * 16 / 9));
+            const last = VIDEO_SCALES.length - 1;
+            const valid = [];
+            VIDEO_SCALES.forEach((s, i) => { if (i === last || s * maxW >= VIDEO_MIN_BOX) valid.push(i); });
+            let idx = valid.find(i => i >= scaleIdx);
+            if (idx === undefined) idx = valid[valid.length - 1];
+            if (fullFit) idx = last;
+            let videoW = Math.round(VIDEO_SCALES[idx] * maxW);
+            videoW = Math.min(videoW, Math.max(availW, 120));
+            return { idx: idx, valid: valid, videoW: videoW };
+        }
+
+
+        function isNativeFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+
+        // Le lecteur est dessiné à une taille logique (640/960/1280 px) puis mis à l'échelle de la boîte :
+        // image + barre de contrôle + boutons rétrécissent ou grandissent ensemble.
         function fitVideoFrame() {
             const body = document.getElementById('videoModalBody');
             const frame = document.getElementById('videoFrame');
             if (!body || !frame) return;
             const w = body.clientWidth, h = body.clientHeight;
             if (!w || !h) return;
-            const k = Math.min(w / VIDEO_BASE_W, h / VIDEO_BASE_H);
+            const baseW = w <= 480 ? 640 : (w <= 800 ? 960 : 1280);
+            const baseH = baseW * 9 / 16;
+            const k = Math.min(w / baseW, h / baseH);
+            frame.style.width = baseW + 'px';
+            frame.style.height = baseH + 'px';
             frame.style.transform = 'scale(' + k + ')';
-            frame.style.left = ((w - VIDEO_BASE_W * k) / 2) + 'px';
-            frame.style.top = ((h - VIDEO_BASE_H * k) / 2) + 'px';
-            frame.style.visibility = 'visible';
+            frame.style.left = ((w - baseW * k) / 2) + 'px';
+            frame.style.top = ((h - baseH * k) / 2) + 'px';
         }
-        window.addEventListener('DOMContentLoaded', () => {
-            const body = document.getElementById('videoModalBody');
-            if (body && window.ResizeObserver) new ResizeObserver(fitVideoFrame).observe(body);
-            window.addEventListener('resize', fitVideoFrame);
-        });
 
-        function applyVideoScale() {
-            const sc = VIDEO_SCALES[videoScaleIdx];
-            document.getElementById('videoModalBox').style.setProperty('--vs', sc);
-            document.getElementById('vsLabel').textContent = Math.round(sc * 100) + '%';
-            document.getElementById('vsMinus').disabled = videoScaleIdx === 0;
-            document.getElementById('vsPlus').disabled = videoScaleIdx === VIDEO_SCALES.length - 1;
+        function layoutVideoModal() {
+            const modal = document.getElementById('videoModal');
+            if (!modal || modal.classList.contains('hidden')) return;
+            const box = document.getElementById('videoModalBox');
+            const header = document.getElementById('videoModalHeader');
+            const bar = document.getElementById('videoModalBar');
+            const fsIcon = document.querySelector('#videoFsBtn i');
+            if (fsIcon) {
+                const on = isNativeFs() || videoPseudoFs;
+                fsIcon.className = 'fas ' + (on ? 'fa-compress' : 'fa-expand') + ' text-xs';
+            }
+            if (isNativeFs()) { fitVideoFrame(); return; }
+
+            modal.style.padding = videoPseudoFs ? 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)' : '';
+            const cs = getComputedStyle(modal);
+            const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+            const availW = modal.clientWidth - padX - 2;
+            const availH = modal.clientHeight - padY - 2 - header.offsetHeight - bar.offsetHeight;
+            const m = videoLayoutMetrics(availW, availH, videoScaleIdx, videoPseudoFs);
+            videoEffIdx = m.idx;
+            videoValid = m.valid;
+
+            box.style.width = (m.videoW + 2) + 'px';
+            box.classList.toggle('rounded-none', videoPseudoFs);
+            box.classList.toggle('rounded-2xl', !videoPseudoFs);
+
+            document.getElementById('vsLabel').textContent = Math.round(VIDEO_SCALES[m.idx] * 100) + '%';
+            const pos = m.valid.indexOf(m.idx);
+            document.getElementById('vsMinus').disabled = videoPseudoFs || pos <= 0;
+            document.getElementById('vsPlus').disabled = videoPseudoFs || pos >= m.valid.length - 1;
+            fitVideoFrame();
         }
 
         function changeVideoScale(dir) {
-            const n = videoScaleIdx + dir;
-            if (n < 0 || n >= VIDEO_SCALES.length) return;
-            videoScaleIdx = n;
-            try { localStorage.setItem('videoScale', VIDEO_SCALES[n]); } catch (e) {}
-            applyVideoScale();
+            const pos = videoValid.indexOf(videoEffIdx) + dir;
+            if (pos < 0 || pos >= videoValid.length) return;
+            videoScaleIdx = videoValid[pos];
+            try { localStorage.setItem('videoScale', VIDEO_SCALES[videoScaleIdx]); } catch (e) {}
+            layoutVideoModal();
         }
 
         function toggleVideoFullscreen() {
-            const box = document.getElementById('videoModalBody');
-            const inFs = document.fullscreenElement || document.webkitFullscreenElement;
-            if (inFs) {
-                (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+            const body = document.getElementById('videoModalBody');
+            if (isNativeFs()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+            if (videoPseudoFs) { videoPseudoFs = false; layoutVideoModal(); return; }
+            const req = body.requestFullscreen || body.webkitRequestFullscreen;
+            const fallback = () => { videoPseudoFs = true; layoutVideoModal(); };
+            if (!req) { fallback(); return; }
+            try {
+                Promise.resolve(req.call(body)).then(() => {
+                    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+                }).catch(fallback);
+            } catch (e) { fallback(); }
+        }
+
+        function openVideoExternal() {
+            if (currentVideoExternal) window.open(currentVideoExternal, '_blank', 'noopener');
+        }
+
+        function openVideoModal(videoId, titre, isPremium, matiere) {
+            if (checkPremiumLock(isPremium, matiere)) return;
+
+            const src = buildVideoSource(videoId);
+            if (!src) {
+                showToast("Vidéo non renseignée pour ce cours.", "warning");
                 return;
             }
-            const req = box.requestFullscreen || box.webkitRequestFullscreen;
-            if (!req) { showToast("Touchez l'icône plein écran dans le lecteur vidéo.", "info"); return; }
-            Promise.resolve(req.call(box)).then(() => {
-                if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
-            }).catch(() => {});
+            currentVideoExternal = src.external;
+
+            const videoModal = document.getElementById('videoModal');
+            const videoModalBody = document.getElementById('videoModalBody');
+            document.getElementById('videoModalTitle').innerText = titre;
+
+            videoModalBody.innerHTML = `
+                <div class="absolute inset-0 flex items-center justify-center text-slate-600"><i class="fas fa-circle-notch fa-spin text-2xl"></i></div>
+                <iframe id="videoFrame" title="Vidéo du cours" style="position:absolute;top:0;left:0;width:640px;height:360px;border:0;transform-origin:0 0;opacity:0;transition:opacity .3s;background:#000"
+                    src="${src.embed.replace(/"/g, '&quot;')}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
+                    onload="this.style.opacity=1"></iframe>`;
+
+            videoPseudoFs = false;
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Empêcher le défilement de l'arrière-plan
+            layoutVideoModal();
+            requestAnimationFrame(layoutVideoModal);
         }
 
         function closeVideoModal(e) {
             if (e && e.target !== document.getElementById('videoModal') && !e.target.closest('button')) return;
-
+            if (isNativeFs()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+            videoPseudoFs = false;
             const videoModal = document.getElementById('videoModal');
-            const videoModalBody = document.getElementById('videoModalBody');
-
-            if (document.fullscreenElement || document.webkitFullscreenElement) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
             videoModal.classList.add('hidden');
-            videoModalBody.innerHTML = ''; // Arrêter la vidéo en nettoyant l'iframe
-            document.body.style.overflow = ''; // Réactiver le défilement
+            videoModal.style.padding = '';
+            document.getElementById('videoModalBody').innerHTML = ''; // Arrêter la vidéo
+            document.body.style.overflow = '';
         }
+
+        // Réagir à tout changement : rotation, redimensionnement, barre d'adresse mobile, plein écran, clavier
+        window.addEventListener('DOMContentLoaded', () => {
+            const body = document.getElementById('videoModalBody');
+            if (body && window.ResizeObserver) new ResizeObserver(fitVideoFrame).observe(body);
+            window.addEventListener('resize', layoutVideoModal);
+            window.addEventListener('orientationchange', () => setTimeout(layoutVideoModal, 250));
+            if (window.visualViewport) window.visualViewport.addEventListener('resize', layoutVideoModal);
+            document.addEventListener('fullscreenchange', layoutVideoModal);
+            document.addEventListener('webkitfullscreenchange', layoutVideoModal);
+            document.addEventListener('keydown', (ev) => {
+                if (ev.key !== 'Escape') return;
+                const modal = document.getElementById('videoModal');
+                if (!modal || modal.classList.contains('hidden') || isNativeFs()) return;
+                if (videoPseudoFs) { videoPseudoFs = false; layoutVideoModal(); } else { closeVideoModal(); }
+            });
+        });
 
         function checkPremiumLock(isPremium, matiere) {
             if (currentUser && currentUser.isAdmin) return false;
