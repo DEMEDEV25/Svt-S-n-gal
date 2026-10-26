@@ -68,43 +68,6 @@
         .fade-in { animation: fadeIn 0.35s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Correction appliquée pour l'affichage correct des vidéos sur mobile */
-        .video-container {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            height: 240px; /* Hauteur fixe adaptée aux smartphones */
-            overflow: hidden;
-            border-radius: 12px;
-            margin: 0 auto;
-            background: #000;
-        }
-
-        @media (min-width: 640px) {
-            .video-container {
-                height: 400px; /* Hauteur plus grande pour tablettes et PC */
-            }
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
-        }
-        .accordion-content.open {
-            max-height: 1000px;
-            transition: max-height 0.6s ease-in-out;
-        }
-
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -319,6 +282,28 @@
         </div>
     </footer>
 
+    <!-- MODAL LECTEUR VIDÉO GRAND ÉCRAN (SOLUTION 1 - MODAL 16:9) -->
+    <div id="videoModal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md transition-all duration-300" onclick="closeVideoModal(event)">
+        <div class="relative w-full max-w-5xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 animate-slide-up" onclick="event.stopPropagation()">
+            <!-- En-tête du modal -->
+            <div class="flex justify-between items-center p-4 sm:p-5 bg-slate-900/90 border-b border-slate-800">
+                <div class="flex items-center gap-3 truncate pr-4">
+                    <div class="w-9 h-9 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center text-sm shrink-0">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <h3 id="videoModalTitle" class="text-sm sm:text-base font-extrabold text-white truncate">Vidéo explicative</h3>
+                </div>
+                <button onclick="closeVideoModal()" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-full transition shrink-0">
+                    <i class="fas fa-times text-base"></i>
+                </button>
+            </div>
+            <!-- Lecteur vidéo 16:9 dynamique -->
+            <div id="videoModalBody" class="w-full bg-black aspect-video relative flex items-center justify-center">
+                <!-- Iframe injecté par JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Modal d'authentification -->
     <div id="authModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-[2.5rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative max-h-[90vh] overflow-y-auto animate-slide-up">
@@ -466,7 +451,7 @@
                         <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Cours, Vidéos & PDF</li>
                         <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Exercices corrigés & Quiz</li>
                     </ul>
-                    <button onclick="orderSubscription('DUO')" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-200 transition">Choisir Duo</button>
+                    <button onclick="orderSubscription('DUO')" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Choisir Duo</button>
                 </div>
 
                 <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl relative flex flex-col md:-translate-y-2">
@@ -945,7 +930,7 @@
             filtered.forEach((course, index) => {
                 const isPremium = course.type_acces === 'premium';
                 const card = document.createElement('div');
-                card.className = `course-card bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-100 flex flex-col h-full relative group animate-slide-up col-span-full`;
+                card.className = `course-card bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-100 flex flex-col h-full relative group animate-slide-up`;
                 card.style.animationDelay = `${index * 40}ms`;
                 
                 const objectifsHtml = (course.cours_objectifs || []).slice(0, 3).map(o => 
@@ -958,7 +943,6 @@
                 if(currentMatiere === 'MATHS') { iconClass = 'fa-calculator'; iconColor = 'bg-red-50 text-red-600'; }
                 if(currentMatiere === 'PC') { iconClass = 'fa-atom'; iconColor = 'bg-purple-50 text-purple-600'; }
 
-                const courseIdUniq = course.id;
                 const videoId = sanitizeInput(course.url_vid || '');
 
                 card.innerHTML = `
@@ -977,16 +961,15 @@
                         </span>
                     </div>
                     
-                    <div class="flex-grow mb-4">
+                    <div class="flex-grow mb-5">
                         <div class="space-y-2">${objectifsHtml || '<p class="text-xs text-slate-400 italic">Objectifs du cours en cours de mise à jour.</p>'}</div>
                     </div>
 
-                    <div class="mb-4 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
-                        <button onclick="toggleVideoAccordion('${courseIdUniq}', '${videoId}', ${isPremium}, '${course.matiere}')" class="w-full px-4 py-3 bg-slate-900 text-white font-bold text-xs flex items-center justify-between hover:bg-slate-800 transition">
-                            <span class="flex items-center gap-2"><i class="fas fa-photo-video text-brand-400"></i> Vidéo explicative</span>
-                            <i id="accordion-icon-${courseIdUniq}" class="fas fa-chevron-down transition-transform duration-300"></i>
+                    <div class="mb-4">
+                        <button onclick="openVideoModal('${videoId}', '${sanitizeInput(course.titre)}', ${isPremium}, '${course.matiere}')" class="w-full px-4 py-3 bg-slate-900 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 hover:bg-brand-600 transition shadow-md active:scale-95">
+                            <i class="fas fa-play-circle text-brand-400 text-sm"></i>
+                            <span>Regarder la vidéo (16:9)</span>
                         </button>
-                        <div id="accordion-content-${courseIdUniq}" class="accordion-content p-3 bg-white"></div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100 mt-auto">
@@ -1008,56 +991,37 @@
             }
         }
 
-        function setVideoFocusMode(activeCourseId) {
-            const activeContent = activeCourseId ? document.getElementById(`accordion-content-${activeCourseId}`) : null;
-            const activeCard = activeContent ? activeContent.closest('.course-card') : null;
-            document.querySelectorAll('#coursesGrid .course-card').forEach(card => {
-                card.classList.toggle('hidden', !!activeCard && card !== activeCard);
-            });
-            return activeCard;
+        // GESTION DU MODAL VIDÉO GRAND ÉCRAN (SOLUTION 1)
+        function openVideoModal(videoId, titre, isPremium, matiere) {
+            if (checkPremiumLock(isPremium, matiere)) return;
+
+            if (!videoId || videoId === 'null' || videoId === 'undefined' || videoId.trim() === '') {
+                showToast("ID de vidéo non renseigné pour ce cours.", "warning");
+                return;
+            }
+
+            const videoModal = document.getElementById('videoModal');
+            const videoModalTitle = document.getElementById('videoModalTitle');
+            const videoModalBody = document.getElementById('videoModalBody');
+
+            videoModalTitle.innerText = titre;
+            videoModalBody.innerHTML = `
+                <iframe class="w-full h-full border-0" src="https://drive.google.com/file/d/${videoId.trim()}/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            `;
+
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Empêcher le défilement de l'arrière-plan
         }
 
-        function toggleVideoAccordion(courseId, videoId, isPremium, matiere) {
-            const contentEl = document.getElementById(`accordion-content-${courseId}`);
-            const iconEl = document.getElementById(`accordion-icon-${courseId}`);
-            const isOpen = contentEl.classList.contains('open');
+        function closeVideoModal(e) {
+            if (e && e.target !== document.getElementById('videoModal') && !e.target.closest('button')) return;
 
-            if (!isOpen) {
-                if (checkPremiumLock(isPremium, matiere)) return;
+            const videoModal = document.getElementById('videoModal');
+            const videoModalBody = document.getElementById('videoModalBody');
 
-                document.querySelectorAll('#coursesGrid .accordion-content.open').forEach(el => {
-                    if (el === contentEl) return;
-                    el.classList.remove('open');
-                    el.innerHTML = '';
-                    const otherIcon = document.getElementById(el.id.replace('accordion-content-', 'accordion-icon-'));
-                    if (otherIcon) otherIcon.classList.remove('rotate-180');
-                });
-
-                if (!videoId || videoId === 'null' || videoId === 'undefined' || videoId.trim() === '') {
-                    contentEl.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">ID de vidéo non renseigné pour ce cours.</p>`;
-                } else {
-                    contentEl.innerHTML = `
-                        <div class="video-container">
-                            <iframe src="https://drive.google.com/file/d/${videoId.trim()}/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                        </div>`;
-                }
-                contentEl.classList.add('open');
-                iconEl.classList.add('rotate-180');
-
-                const activeCard = setVideoFocusMode(courseId);
-                if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                contentEl.classList.remove('open');
-                iconEl.classList.remove('rotate-180');
-
-                setVideoFocusMode(null);
-                const closedCard = contentEl.closest('.course-card');
-                if (closedCard) closedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                setTimeout(() => {
-                    if (!contentEl.classList.contains('open')) contentEl.innerHTML = '';
-                }, 400);
-            }
+            videoModal.classList.add('hidden');
+            videoModalBody.innerHTML = ''; // Arrêter la vidéo en nettoyant l'iframe
+            document.body.style.overflow = ''; // Réactiver le défilement
         }
 
         function checkPremiumLock(isPremium, matiere) {
