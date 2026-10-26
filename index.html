@@ -75,6 +75,16 @@
         .subject-tab.active-svt { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35); }
         .subject-tab.active-maths { background-color: #dc2626; color: white; border-color: #dc2626; box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.35); }
         .subject-tab.active-pc { background-color: #7c3aed; color: white; border-color: #7c3aed; box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.35); }
+
+        /* Styles spécifiques pour le lecteur vidéo principal */
+        #mainVideoSection { transition: margin 0.2s ease; }
+        #mainVideoFrame { box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4); }
+        #mainVideoFrame:fullscreen { width: 100vw !important; height: 100vh !important; border-radius: 0; }
+        #mainVideoFrame:-webkit-full-screen { width: 100vw !important; height: 100vh !important; border-radius: 0; }
+        #mainVideoFrame:fullscreen iframe,
+        #mainVideoFrame:-webkit-full-screen iframe { top: 0 !important; height: 100% !important; }
+        
+        .video-help-banner { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col">
@@ -198,13 +208,7 @@
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full">
         <!-- LECTEUR VIDÉO PRINCIPAL DÉDIÉ (HORS DES CARTES) -->
-        <div id="mainVideoSection" class="hidden mb-8 flex justify-center scroll-mt-24">
-            <div id="mainVideoFrame" class="relative w-full bg-black overflow-hidden" style="aspect-ratio: 16/9;">
-                <div id="mainVideoBody" class="absolute inset-0 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-circle-notch fa-spin text-2xl text-brand-500"></i>
-                </div>
-            </div>
-        </div>
+        <div id="mainVideoSection" class="hidden mb-8 flex flex-col items-center scroll-mt-24"></div>
 
         <div class="flex flex-wrap justify-center gap-2.5 sm:gap-3 mb-6">
             <button onclick="switchMatiere('SVT')" id="btnMatSVT" class="subject-tab active-svt px-5 sm:px-6 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 flex items-center gap-2">
@@ -703,6 +707,25 @@
             "Ton BAC et ton BFEM se préparent dès aujourd'hui."
         ];
 
+        // ============================================================
+        // DÉTECTION D'APPAREIL ET DE NAVIGATEUR
+        // ============================================================
+        
+        function isMobileDevice() {
+            return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) 
+                || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+        }
+
+        function isInAppBrowser() {
+            const ua = navigator.userAgent || '';
+            return /FBAN|FBAV|Instagram|WhatsApp|Line\/|Twitter|MicroMessenger|Snapchat/i.test(ua);
+        }
+
+        function isIOS() {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent) 
+                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
         // Fonction de nettoyage anti-XSS et sécurisation des chaînes
         function sanitizeInput(str) {
             if (!str) return '';
@@ -740,6 +763,13 @@
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => handleFilterClick(e.target));
             });
+
+            // Alerte WebView in-app
+            if (isInAppBrowser()) {
+                setTimeout(() => {
+                    showToast("Pour une meilleure lecture des vidéos, ouvrez ce site dans Chrome ou Safari.", "warning");
+                }, 1500);
+            }
         });
 
         async function loadParametersFromDB() {
@@ -1008,9 +1038,10 @@
         }
 
         // Hauteur (px) de la barre noire que le lecteur Google Drive ajoute en haut de son iframe.
-        // Valeur volontairement prudente : trop petite = au pire une fine bande noire invisible sur le fond noir ;
-        // trop grande = le haut de l'image serait rogné.
-        const DRIVE_BAR_PX = 56;
+        // Réduite sur mobile où la barre Drive est plus compacte.
+        function getDriveBarPx() {
+            return isMobileDevice() ? 48 : 56;
+        }
 
         function playMainVideo(videoId, titre, isPremium, matiere) {
             if (checkPremiumLock(isPremium, matiere)) return;
@@ -1023,32 +1054,93 @@
             currentVideoExternal = src.external;
 
             const section = document.getElementById('mainVideoSection');
-            const bodyEl = document.getElementById('mainVideoBody');
+            const isDrive = /(^|\.)drive\.google\.com$/.test(new URL(src.embed).hostname);
+            const off = isDrive ? getDriveBarPx() : 0;
+            const mobile = isMobileDevice();
+            const inApp = isInAppBrowser();
 
-            // Le lecteur Google Drive affiche sa propre barre noire (titre + icône "ouvrir")
-            // en haut de l'iframe et décale la vidéo vers le bas : le bas est alors rogné.
-            // On agrandit donc l'iframe de la hauteur de cette barre et on la remonte ;
-            // le cadre (overflow:hidden) cache la barre et montre la vidéo en entier.
-            const off = /(^|\.)drive\.google\.com$/.test(new URL(src.embed).hostname) ? DRIVE_BAR_PX : 0;
-            bodyEl.innerHTML = `
-                <iframe src="${src.embed.replace(/"/g, '&quot;')}"
-                        style="position:absolute; left:0; width:100%; top:-${off}px; height:calc(100% + ${off}px); border:0;"
-                        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                        allowfullscreen
-                        referrerpolicy="strict-origin-when-cross-origin">
-                </iframe>`;
+            // Construction du HTML du lecteur
+            let html = `
+                <div id="mainVideoFrame" class="relative w-full bg-black overflow-hidden rounded-2xl" style="aspect-ratio: 16/9;">
+                    <div id="mainVideoBody" class="absolute inset-0 flex items-center justify-center text-slate-500">
+                        <iframe src="${src.embed.replace(/"/g, '&quot;')}"
+                                style="position:absolute; left:0; width:100%; top:-${off}px; height:calc(100% + ${off}px); border:0;"
+                                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                                allowfullscreen
+                                referrerpolicy="strict-origin-when-cross-origin">
+                        </iframe>
+                    </div>
+                    <button onclick="toggleVideoFullscreen()"
+                        class="absolute bottom-3 right-3 z-20 bg-black/70 hover:bg-black text-white rounded-full w-11 h-11 flex items-center justify-center shadow-lg backdrop-blur-sm transition"
+                        title="Plein écran">
+                        <i class="fas fa-expand text-base"></i>
+                    </button>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center gap-2 mt-3 w-full">
+                    <p class="text-xs font-bold text-slate-700 flex-1 truncate"><i class="fas fa-play-circle text-brand-500 mr-1"></i> ${sanitizeInput(titre)}</p>
+                    <div class="flex gap-2">
+                        <button onclick="openVideoExternal()" class="px-3 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold hover:bg-brand-700 transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fab fa-google-drive text-sm"></i> Ouvrir dans Drive
+                        </button>
+                        <button onclick="closeMainVideo()" class="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-300 transition flex items-center gap-1.5">
+                            <i class="fas fa-times text-sm"></i> Fermer
+                        </button>
+                    </div>
+                </div>`;
 
+            // Bandeau d'aide spécifique mobile / WebView in-app
+            if (mobile || inApp) {
+                let warningText = "";
+                if (inApp) {
+                    warningText = "Vous êtes dans un navigateur intégré (WhatsApp/Facebook). Pour une meilleure lecture, ouvrez le site dans Chrome ou Safari.";
+                } else if (isIOS()) {
+                    warningText = "Sur iPhone, le lecteur Drive peut ne pas démarrer directement. Utilisez « Ouvrir dans Drive » si besoin.";
+                } else {
+                    warningText = "Si la vidéo ne démarre pas, appuyez sur « Ouvrir dans Drive » ou sur le bouton plein écran.";
+                }
+                html += `<div class="video-help-banner w-full mt-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-800 font-medium flex items-start gap-2">
+                    <i class="fas fa-info-circle text-amber-600 mt-0.5 shrink-0"></i>
+                    <span>${warningText}</span>
+                </div>`;
+            }
+
+            section.innerHTML = html;
             section.classList.remove('hidden');
             fitMainVideo();
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Ajuste le cadre 16/9 à la hauteur réellement disponible :
-        // hauteur visible - barre de nav sticky - bandeau titre/boutons de la vidéo
+        // Plein écran natif sur le cadre (fonctionne bien sur Android, et iOS 15+)
+        function toggleVideoFullscreen() {
+            const frame = document.getElementById('mainVideoFrame');
+            if (!frame) return;
+            const fsElement = document.fullscreenElement || document.webkitFullscreenElement;
+            if (!fsElement) {
+                const req = frame.requestFullscreen || frame.webkitRequestFullscreen || frame.msRequestFullscreen;
+                if (req) {
+                    req.call(frame).catch(() => {
+                        // Fallback iOS : ouvrir dans Drive
+                        if (isIOS() && currentVideoExternal) {
+                            showToast("Plein écran non supporté, ouverture dans Drive...", "info");
+                            openVideoExternal();
+                        }
+                    });
+                } else if (isIOS() && currentVideoExternal) {
+                    showToast("Plein écran non supporté, ouverture dans Drive...", "info");
+                    openVideoExternal();
+                }
+            } else {
+                const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+                if (exit) exit.call(document);
+            }
+        }
+
+        // Ajuste le cadre 16/9 : pleine largeur, hauteur limitée à la zone visible
         function fitMainVideo() {
             const section = document.getElementById('mainVideoSection');
             if (!section || section.classList.contains('hidden')) return;
             const frame = document.getElementById('mainVideoFrame');
+            if (!frame) return;
             const nav = document.getElementById('navbar');
             const navH = nav ? nav.offsetHeight : 0;
             const vw = document.documentElement.clientWidth;
@@ -1061,24 +1153,25 @@
             section.style.width = vw + 'px';
             section.style.marginLeft = (-parentLeft) + 'px';
 
-            // Cadre 16/9 : pleine largeur, mais jamais plus haut que l'écran visible
-            // (hauteur visible - navbar sticky - petite marge)
-            const availH = vh - navH - 16;
-            const w = Math.max(Math.min(vw, availH * 16 / 9), 240);
+            // 16/9 strict : on prend la plus petite dimension entre "largeur écran" et "hauteur disponible * 16/9"
+            // Pas de plancher 240px qui débordait sur mobile
+            const availH = Math.max(vh - navH - 16, 180);
+            const wByHeight = availH * 16 / 9;
+            const w = Math.min(vw, wByHeight);
             frame.style.width = w + 'px';
             frame.style.height = (w * 9 / 16) + 'px';
             section.style.scrollMarginTop = (navH + 8) + 'px';
         }
+
         window.addEventListener('load', fitMainVideo);
         window.addEventListener('resize', fitMainVideo);
-        window.addEventListener('orientationchange', () => setTimeout(fitMainVideo, 200));
+        window.addEventListener('orientationchange', () => setTimeout(fitMainVideo, 250));
         if (window.visualViewport) window.visualViewport.addEventListener('resize', fitMainVideo);
 
         function closeMainVideo() {
             const section = document.getElementById('mainVideoSection');
-            const bodyEl = document.getElementById('mainVideoBody');
             section.classList.add('hidden');
-            bodyEl.innerHTML = ''; // Arrêter la lecture vidéo
+            section.innerHTML = ''; // Arrête la lecture et libère le DOM
             currentVideoExternal = '';
         }
 
