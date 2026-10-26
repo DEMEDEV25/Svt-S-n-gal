@@ -68,16 +68,24 @@
         .fade-in { animation: fadeIn 0.35s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Correction appliquée pour l'affichage correct des vidéos sur mobile */
         .video-container {
             position: relative;
             width: 100%;
             max-width: 900px;
-            height: 0;
-            padding-bottom: 56.25%;
+            height: 240px; /* Hauteur fixe adaptée aux smartphones */
             overflow: hidden;
             border-radius: 12px;
             margin: 0 auto;
+            background: #000;
         }
+
+        @media (min-width: 640px) {
+            .video-container {
+                height: 400px; /* Hauteur plus grande pour tablettes et PC */
+            }
+        }
+
         .video-container iframe {
             position: absolute;
             top: 0;
@@ -458,7 +466,7 @@
                         <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Cours, Vidéos & PDF</li>
                         <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> Exercices corrigés & Quiz</li>
                     </ul>
-                    <button onclick="orderSubscription('DUO')" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Choisir Duo</button>
+                    <button onclick="orderSubscription('DUO')" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-200 transition">Choisir Duo</button>
                 </div>
 
                 <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl relative flex flex-col md:-translate-y-2">
@@ -989,7 +997,6 @@
                 grid.appendChild(card);
             });
 
-            // Activer le rendu mathématique KaTeX après le rendu de la grille
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(grid, {
                     delimiters: [
@@ -1001,7 +1008,6 @@
             }
         }
 
-        // Mode "une seule vidéo à la fois" : masque toutes les autres leçons tant qu'une vidéo est ouverte
         function setVideoFocusMode(activeCourseId) {
             const activeContent = activeCourseId ? document.getElementById(`accordion-content-${activeCourseId}`) : null;
             const activeCard = activeContent ? activeContent.closest('.course-card') : null;
@@ -1019,7 +1025,6 @@
             if (!isOpen) {
                 if (checkPremiumLock(isPremium, matiere)) return;
 
-                // Sécurité : ferme tout autre accordéon encore ouvert (une seule vidéo à la fois)
                 document.querySelectorAll('#coursesGrid .accordion-content.open').forEach(el => {
                     if (el === contentEl) return;
                     el.classList.remove('open');
@@ -1039,19 +1044,16 @@
                 contentEl.classList.add('open');
                 iconEl.classList.add('rotate-180');
 
-                // Masquer toutes les autres leçons et centrer la leçon active
                 const activeCard = setVideoFocusMode(courseId);
                 if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } else {
                 contentEl.classList.remove('open');
                 iconEl.classList.remove('rotate-180');
 
-                // Réafficher toutes les leçons et revenir à la leçon qui vient d'être fermée
                 setVideoFocusMode(null);
                 const closedCard = contentEl.closest('.course-card');
                 if (closedCard) closedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                // Ne vide le lecteur que si la vidéo n'a pas été rouverte entre-temps
                 setTimeout(() => {
                     if (!contentEl.classList.contains('open')) contentEl.innerHTML = '';
                 }, 400);
@@ -1561,7 +1563,6 @@
                     <div class="space-y-3">${optionsHtml}</div>
                 </div>`;
             
-            // Appliquer le rendu mathématique KaTeX dans le modal de quiz
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(contentDiv, {
                     delimiters: [
@@ -1629,7 +1630,6 @@
             const contentDiv = document.getElementById('quizContent');
             contentDiv.innerHTML = resultHtml + '</div>'; 
             
-            // Appliquer le rendu mathématique KaTeX sur les résultats et explications
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(contentDiv, {
                     delimiters: [
@@ -1752,9 +1752,6 @@
             window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent("Bonjour, j'ai besoin d'assistance pour mon compte Excellence Académie.")}`, '_blank'); 
         }
 
-        /* ---------------------------------------------------
-           LOGIQUE DU PANNEAU D'ADMINISTRATION
-        --------------------------------------------------- */
         async function openAdminModal() {
             if (!currentUser || !currentUser.isAdmin) return;
             document.getElementById('adminModal').classList.remove('hidden');
