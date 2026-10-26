@@ -1007,6 +1007,11 @@
             return { embed: v, external: v };
         }
 
+        // Hauteur (px) de la barre noire que le lecteur Google Drive ajoute en haut de son iframe.
+        // Valeur volontairement prudente : trop petite = au pire une fine bande noire invisible sur le fond noir ;
+        // trop grande = le haut de l'image serait rogné.
+        const DRIVE_BAR_PX = 56;
+
         function playMainVideo(videoId, titre, isPremium, matiere) {
             if (checkPremiumLock(isPremium, matiere)) return;
 
@@ -1024,8 +1029,7 @@
             // en haut de l'iframe et décale la vidéo vers le bas : le bas est alors rogné.
             // On agrandit donc l'iframe de la hauteur de cette barre et on la remonte ;
             // le cadre (overflow:hidden) cache la barre et montre la vidéo en entier.
-            const DRIVE_BAR_PX = 58;
-            const off = src.embed.indexOf('drive.google.com') !== -1 ? DRIVE_BAR_PX : 0;
+            const off = /(^|\.)drive\.google\.com$/.test(new URL(src.embed).hostname) ? DRIVE_BAR_PX : 0;
             bodyEl.innerHTML = `
                 <iframe src="${src.embed.replace(/"/g, '&quot;')}"
                         style="position:absolute; left:0; width:100%; top:-${off}px; height:calc(100% + ${off}px); border:0;"
@@ -1065,6 +1069,7 @@
             frame.style.height = (w * 9 / 16) + 'px';
             section.style.scrollMarginTop = (navH + 8) + 'px';
         }
+        window.addEventListener('load', fitMainVideo);
         window.addEventListener('resize', fitMainVideo);
         window.addEventListener('orientationchange', () => setTimeout(fitMainVideo, 200));
         if (window.visualViewport) window.visualViewport.addEventListener('resize', fitMainVideo);
