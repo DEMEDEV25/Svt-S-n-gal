@@ -199,7 +199,7 @@
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full">
         <!-- LECTEUR VIDÉO PRINCIPAL DÉDIÉ (HORS DES CARTES) -->
         <div id="mainVideoSection" class="hidden mb-8 flex justify-center scroll-mt-24">
-            <div id="mainVideoFrame" class="relative w-full bg-black" style="aspect-ratio: 16/9;">
+            <div id="mainVideoFrame" class="relative w-full bg-black overflow-hidden" style="aspect-ratio: 16/9;">
                 <div id="mainVideoBody" class="absolute inset-0 flex items-center justify-center text-slate-500">
                     <i class="fas fa-circle-notch fa-spin text-2xl text-brand-500"></i>
                 </div>
@@ -1020,11 +1020,17 @@
             const section = document.getElementById('mainVideoSection');
             const bodyEl = document.getElementById('mainVideoBody');
 
+            // Le lecteur Google Drive affiche sa propre barre noire (titre + icône "ouvrir")
+            // en haut de l'iframe et décale la vidéo vers le bas : le bas est alors rogné.
+            // On agrandit donc l'iframe de la hauteur de cette barre et on la remonte ;
+            // le cadre (overflow:hidden) cache la barre et montre la vidéo en entier.
+            const DRIVE_BAR_PX = 58;
+            const off = src.embed.indexOf('drive.google.com') !== -1 ? DRIVE_BAR_PX : 0;
             bodyEl.innerHTML = `
-                <iframe src="${src.embed.replace(/"/g, '&quot;')}" 
-                        class="absolute top-0 left-0 w-full h-full border-0" 
-                        allow="autoplay; encrypted-media; fullscreen; picture-in-picture" 
-                        allowfullscreen 
+                <iframe src="${src.embed.replace(/"/g, '&quot;')}"
+                        style="position:absolute; left:0; width:100%; top:-${off}px; height:calc(100% + ${off}px); border:0;"
+                        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                        allowfullscreen
                         referrerpolicy="strict-origin-when-cross-origin">
                 </iframe>`;
 
@@ -1041,10 +1047,22 @@
             const frame = document.getElementById('mainVideoFrame');
             const nav = document.getElementById('navbar');
             const navH = nav ? nav.offsetHeight : 0;
+            const vw = document.documentElement.clientWidth;
             const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-            const availH = vh - navH - 16; // hauteur visible - navbar sticky - marge
-            const maxW = Math.max(availH * 16 / 9, 240);
-            frame.style.width = Math.min(maxW, section.clientWidth) + 'px';
+
+            // Le lecteur sort du conteneur et occupe toute la largeur de l'écran
+            const parent = section.parentElement;
+            const cs = getComputedStyle(parent);
+            const parentLeft = parent.getBoundingClientRect().left + parseFloat(cs.paddingLeft);
+            section.style.width = vw + 'px';
+            section.style.marginLeft = (-parentLeft) + 'px';
+
+            // Cadre 16/9 : pleine largeur, mais jamais plus haut que l'écran visible
+            // (hauteur visible - navbar sticky - petite marge)
+            const availH = vh - navH - 16;
+            const w = Math.max(Math.min(vw, availH * 16 / 9), 240);
+            frame.style.width = w + 'px';
+            frame.style.height = (w * 9 / 16) + 'px';
             section.style.scrollMarginTop = (navH + 8) + 'px';
         }
         window.addEventListener('resize', fitMainVideo);
