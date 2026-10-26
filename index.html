@@ -77,7 +77,7 @@
         .subject-tab.active-maths { background-color: #dc2626; color: white; border-color: #dc2626; box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.35); }
         .subject-tab.active-pc { background-color: #7c3aed; color: white; border-color: #7c3aed; box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.35); }
     /* Largeur de la boîte vidéo = échelle (--vs) x largeur max qui tient dans l'écran (jamais plus haute que l'écran) */
-    .vbox{--vs:.5;width:max(260px,calc(var(--vs) * min(100vw - 1.5rem, 64rem, (100dvh - 7.5rem) * 16 / 9)));max-width:calc(100vw - 1.5rem);transition:width .25s ease}
+    .vbox{--vs:.5;width:max(260px,calc(var(--vs) * min(100vw - 1.5rem, 64rem, (100dvh - 7.5rem) * 16 / 9)));max-width:calc(100vw - 1.5rem)}
     #videoModalBody:fullscreen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
 #videoModalBody:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
 </style>
@@ -297,7 +297,7 @@
                 </button>
             </div>
             <!-- Lecteur vidéo 16:9 : prend toute la largeur de la boîte, la boîte suit l'échelle -->
-            <div id="videoModalBody" class="w-full bg-black relative" style="aspect-ratio:16/9;">
+            <div id="videoModalBody" class="w-full bg-black relative overflow-hidden" style="aspect-ratio:16/9;">
                 <!-- Iframe injecté par JS -->
             </div>
             <!-- Barre de contrôle de l'échelle -->
@@ -1012,11 +1012,12 @@
 
             videoModalTitle.innerText = titre;
             videoModalBody.innerHTML = `
-                <iframe class="w-full h-full border-0" src="https://drive.google.com/file/d/${videoId.trim()}/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <iframe id="videoFrame" style="position:absolute;top:0;left:0;width:1280px;height:720px;border:0;transform-origin:0 0;visibility:hidden" src="https://drive.google.com/file/d/${videoId.trim()}/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             `;
 
             applyVideoScale();
             videoModal.classList.remove('hidden');
+            requestAnimationFrame(fitVideoFrame);
             document.body.style.overflow = 'hidden'; // Empêcher le défilement de l'arrière-plan
         }
 
@@ -1028,6 +1029,26 @@
             const i = VIDEO_SCALES.indexOf(saved);
             if (i !== -1) videoScaleIdx = i;
         } catch (e) {}
+
+        // Met la VIDÉO ELLE-MÊME à l'échelle : le lecteur (1280x720) est réduit/agrandi avec transform
+        const VIDEO_BASE_W = 1280, VIDEO_BASE_H = 720;
+        function fitVideoFrame() {
+            const body = document.getElementById('videoModalBody');
+            const frame = document.getElementById('videoFrame');
+            if (!body || !frame) return;
+            const w = body.clientWidth, h = body.clientHeight;
+            if (!w || !h) return;
+            const k = Math.min(w / VIDEO_BASE_W, h / VIDEO_BASE_H);
+            frame.style.transform = 'scale(' + k + ')';
+            frame.style.left = ((w - VIDEO_BASE_W * k) / 2) + 'px';
+            frame.style.top = ((h - VIDEO_BASE_H * k) / 2) + 'px';
+            frame.style.visibility = 'visible';
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const body = document.getElementById('videoModalBody');
+            if (body && window.ResizeObserver) new ResizeObserver(fitVideoFrame).observe(body);
+            window.addEventListener('resize', fitVideoFrame);
+        });
 
         function applyVideoScale() {
             const sc = VIDEO_SCALES[videoScaleIdx];
