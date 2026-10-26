@@ -76,7 +76,9 @@
         .subject-tab.active-svt { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35); }
         .subject-tab.active-maths { background-color: #dc2626; color: white; border-color: #dc2626; box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.35); }
         .subject-tab.active-pc { background-color: #7c3aed; color: white; border-color: #7c3aed; box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.35); }
-    </style>
+    #videoModalBody:fullscreen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
+#videoModalBody:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important}
+</style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col">
 
@@ -283,22 +285,25 @@
     </footer>
 
     <!-- MODAL LECTEUR VIDÉO GRAND ÉCRAN (SOLUTION 1 - MODAL 16:9) -->
-    <div id="videoModal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md transition-all duration-300" onclick="closeVideoModal(event)">
-        <div class="relative w-full max-w-5xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 animate-slide-up" onclick="event.stopPropagation()">
+    <div id="videoModal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-0 sm:p-6 bg-slate-950/95 sm:bg-slate-950/85 backdrop-blur-md transition-all duration-300" onclick="closeVideoModal(event)">
+        <div class="relative w-full sm:max-w-5xl bg-slate-900 sm:rounded-3xl overflow-hidden shadow-2xl sm:border border-slate-800 animate-slide-up" style="max-height:100dvh" onclick="event.stopPropagation()">
             <!-- En-tête du modal -->
-            <div class="flex justify-between items-center p-4 sm:p-5 bg-slate-900/90 border-b border-slate-800">
+            <div class="flex justify-between items-center px-3 py-2 sm:p-5 bg-slate-900/90 border-b border-slate-800" style="min-height:56px">
                 <div class="flex items-center gap-3 truncate pr-4">
                     <div class="w-9 h-9 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center text-sm shrink-0">
                         <i class="fas fa-play"></i>
                     </div>
                     <h3 id="videoModalTitle" class="text-sm sm:text-base font-extrabold text-white truncate">Vidéo explicative</h3>
                 </div>
+                <button id="videoFsBtn" onclick="toggleVideoFullscreen()" class="w-10 h-10 mr-2 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-full transition shrink-0" title="Plein écran">
+                    <i class="fas fa-expand text-sm"></i>
+                </button>
                 <button onclick="closeVideoModal()" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-full transition shrink-0">
                     <i class="fas fa-times text-base"></i>
                 </button>
             </div>
             <!-- Lecteur vidéo 16:9 dynamique -->
-            <div id="videoModalBody" class="w-full bg-black aspect-video relative flex items-center justify-center">
+            <div id="videoModalBody" class="bg-black relative flex items-center justify-center mx-auto" style="aspect-ratio:16/9; width:min(100%, calc((100dvh - 56px) * 16 / 9));">
                 <!-- Iframe injecté par JS -->
             </div>
         </div>
@@ -1013,12 +1018,27 @@
             document.body.style.overflow = 'hidden'; // Empêcher le défilement de l'arrière-plan
         }
 
+        function toggleVideoFullscreen() {
+            const box = document.getElementById('videoModalBody');
+            const inFs = document.fullscreenElement || document.webkitFullscreenElement;
+            if (inFs) {
+                (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+                return;
+            }
+            const req = box.requestFullscreen || box.webkitRequestFullscreen;
+            if (!req) { showToast("Touchez l'icône plein écran dans le lecteur vidéo.", "info"); return; }
+            Promise.resolve(req.call(box)).then(() => {
+                if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+            }).catch(() => {});
+        }
+
         function closeVideoModal(e) {
             if (e && e.target !== document.getElementById('videoModal') && !e.target.closest('button')) return;
 
             const videoModal = document.getElementById('videoModal');
             const videoModalBody = document.getElementById('videoModalBody');
 
+            if (document.fullscreenElement || document.webkitFullscreenElement) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
             videoModal.classList.add('hidden');
             videoModalBody.innerHTML = ''; // Arrêter la vidéo en nettoyant l'iframe
             document.body.style.overflow = ''; // Réactiver le défilement
